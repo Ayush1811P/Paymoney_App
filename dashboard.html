@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - Dashboard</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+      
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+      
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+  
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li class="active"><a href="#wallet">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="#wallet">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+  
+  <main class="dashboard-container">
+    <section class="balance-section">
+      <div class="balance-card">
+        <h2>Wallet Balance</h2>
+        <div class="balance-amount-container" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: var(--spacing-xs);">
+          <div class="amount" style="margin-bottom: 0;">₹<span id="walletBalance">***</span></div>
+          <button type="button" id="toggleBalanceBtn" class="toggle-balance-btn" aria-label="Toggle balance visibility" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;">
+            <svg class="eye-icon eye-open" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none; width:22px; height:22px; fill:var(--text-medium); transition: fill var(--transition-fast);">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+            <svg class="eye-icon eye-closed" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px; fill:var(--text-medium); transition: fill var(--transition-fast);">
+              <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 2.2 0 4.27-.61 6.04-1.66l.46.46 2.28 2.28 1.27-1.27L3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+            </svg>
+          </button>
+        </div>
+        <p>Last updated: <span id="lastUpdated">Today</span></p>
+      </div>
+      
+      <div class="action-buttons">
+        <button id="sendMoneyBtn" class="btn btn-primary">Send Money</button>
+      </div>
+    </section>
+    
+    <section class="quick-actions">
+      <h3>Quick Actions</h3>
+      <div class="action-grid">
+        <a href="recharge.html" class="action-item">
+          <div class="action-icon mobile-recharge"></div>
+          <p>Mobile Recharge</p>
+        </a>
+        <a href="fd.html" class="action-item">
+          <div class="action-icon fd"></div>
+          <p>FD Account</p>
+        </a>
+        <a href="electricity.html" class="action-item">
+          <div class="action-icon electricity"></div>
+          <p>Electricity</p>
+        </a>
+        <a href="dth.html" class="action-item">
+          <div class="action-icon dth"></div>
+          <p>DTH</p>
+        </a>
+        <a href="broadband.html" class="action-item">
+          <div class="action-icon broadband"></div>
+          <p>Broadband</p>
+        </a>
+
+        <a href="upi.html" class="action-item">
+          <div class="action-icon upi"></div>
+          <p>UPI Transfer</p>
+        </a>
+        <a href="offers.html" class="action-item">
+          <div class="action-icon cashback"></div>
+          <p>Cashback Offers</p>
+        </a>
+        <a href="support.html" class="action-item">
+          <div class="action-icon help"></div>
+          <p>Help & Support</p>
+        </a>
+      </div>
+    </section>
+    
+    <section class="transactions-section">
+      <h3>Recent Transactions</h3>
+      <div id="transactionsList" class="transactions-list">
+        <!-- Transactions will be populated here by JavaScript -->
+      </div>
+    </section>
+  </main>
+  
+  <!-- Send Money Modal -->
+  <div id="sendMoneyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Send Money</h2>
+      <form id="sendMoneyForm">
+        <div class="form-group">
+          <label for="recipientMobile">Mobile Number / UPI ID</label>
+          <input type="text" id="recipientMobile" required placeholder="Enter mobile or UPI ID">
+        </div>
+        
+        <div class="form-group">
+          <label for="sendAmount">Amount (₹)</label>
+          <input type="number" id="sendAmount" min="0.01" step="0.01" required placeholder="Enter amount">
+        </div>
+        <div class="form-group">
+          <label for="sendNote">Note (Optional)</label>
+          <input type="text" id="sendNote" placeholder="Add a note">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Send Money</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  
+  <script src="js/utils.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

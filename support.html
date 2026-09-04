@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - Help & Support</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/support.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+      
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+      
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+  
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+  
+  <main class="support-container">
+    <!-- Left Column: FAQs & Support Ticket -->
+    <div class="support-main-content">
+      
+      <!-- FAQ Accordions -->
+      <div class="support-card">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-section">
+          <div class="faq-category-title">Wallet & Add Money</div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Why is my transaction failing during Add Money?</span>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="faq-answer">
+              Add Money transactions may fail due to: (1) Hourly cooldown limits - you can only add money once per hour. (2) Daily limits on adding money (₹50,000 maximum). (3) Bank network connectivity failures. Please wait and try again or use another payment mode.
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Are there any charges for transferring money to my wallet?</span>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="faq-answer">
+              No, adding money to your PayMoney wallet via UPI, Debit Cards, or Net Banking is completely free. No transactional or service fee is charged.
+            </div>
+          </div>
+        </div>
+        
+        <div class="faq-section">
+          <div class="faq-category-title">Recharges & Bill Payments</div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>My recharge was successful but the benefits are not received.</span>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="faq-answer">
+              Usually, operators process recharges within a few minutes. If it has been more than 2 hours, please check with your operator support or double-check the mobile number/subscriber ID you recharge. You can download the payment receipt from your transaction list as proof.
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>How do I fetch my Electricity bill?</span>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="faq-answer">
+              Go to the Electricity Bill payment screen, select your State, choose the Electricity Board, and input your Consumer Number. Click "Fetch Bill" to view the outstanding amount and due date.
+            </div>
+          </div>
+        </div>
+        
+        <div class="faq-section">
+          <div class="faq-category-title">UPI & Security</div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>What is a UPI ID and how do I create it?</span>
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="faq-answer">
+              A UPI ID is your virtual payment address (e.g. mobile@paymoney). You can link your bank account under the UPI page and set up a custom 4-digit UPI PIN to process direct peer-to-peer transfers.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Raise a Ticket -->
+      <div class="support-card" id="ticketCard">
+        <h2>Raise a Support Ticket</h2>
+        <p style="color: var(--text-light); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
+          Cannot find what you are looking for? Submit a ticket and our support executives will get back to you within 24 hours.
+        </p>
+        
+        <form id="ticketForm" class="ticket-form">
+          <div class="form-group">
+            <label for="ticketCategory">Select Category</label>
+            <select id="ticketCategory" required>
+              <option value="" disabled selected>Select Category</option>
+              <option value="wallet">Wallet & Add Money</option>
+              <option value="recharge">Mobile & DTH Recharge</option>
+              <option value="bills">Broadband & Utility Bills</option>
+              <option value="upi">UPI & Fund Transfers</option>
+              <option value="kyc">KYC & Account Settings</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="ticketReferenceId">Reference ID / Txn ID (Optional)</label>
+            <input type="text" id="ticketReferenceId" placeholder="e.g. TXN123456789">
+          </div>
+          
+          <div class="form-group">
+            <label for="ticketDescription">Description of your problem</label>
+            <textarea id="ticketDescription" rows="4" placeholder="Explain the issue you faced in detail..." required style="width: 100%; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: var(--spacing-sm); font-family: inherit; font-size: var(--font-size-sm); outline: none; transition: border-color 0.2s;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Submit Support Ticket</button>
+        </form>
+        
+        <!-- Ticket Success Card -->
+        <div id="ticketSuccessCard" class="ticket-receipt-card hidden">
+          <h4>Ticket Raised Successfully</h4>
+          <div class="detail-row">
+            <span>Ticket Reference ID:</span>
+            <span id="successTicketId" style="font-weight: 700;">-</span>
+          </div>
+          <div class="detail-row">
+            <span>Category:</span>
+            <span id="successTicketCategory">-</span>
+          </div>
+          <div class="detail-row">
+            <span>Estimated Response:</span>
+            <span style="color: var(--success-color); font-weight: 500;">Within 24 Hours</span>
+          </div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-light); margin-top: var(--spacing-sm); margin-bottom: 0;">
+            A confirmation has been sent to your registered email. Please use the Ticket Reference ID for future communications.
+          </p>
+          <button id="downloadTicketReceiptBtn" class="btn btn-outline" style="width: 100%; margin-top: var(--spacing-md);">Download Ticket Receipt</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Interactive Chat Bot Widget -->
+    <div class="support-sidebar">
+      <div class="chat-widget">
+        <div class="chat-header">
+          <div class="chat-agent-avatar">PM</div>
+          <div class="chat-agent-info">
+            <span class="chat-agent-name">PayMoney Assistant</span>
+            <span class="chat-agent-status">Online Support</span>
+          </div>
+          <button id="closeChatBtn" class="chat-close-btn" aria-label="Close chat">&times;</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-bubble bot">
+            Hello! I am your PayMoney Support Assistant. How can I help you today?
+          </div>
+          <div class="chat-bubble bot">
+            You can ask me about failed payments, recharges, wallet balances, or account issues. Or select a quick inquiry topic below!
+          </div>
+        </div>
+        
+        <div class="chat-quick-replies" id="chatQuickReplies">
+          <button class="quick-reply-btn" data-query="Recharge failed, amount deducted">Recharge failed</button>
+          <button class="quick-reply-btn" data-query="How to reset UPI PIN?">Reset UPI PIN</button>
+          <button class="quick-reply-btn" data-query="Add Money cooldown error">Add Money error</button>
+          <button class="quick-reply-btn" data-query="How to complete KYC?">KYC Help</button>
+        </div>
+        
+        <div class="chat-footer">
+          <input type="text" id="chatInput" class="chat-input-field" placeholder="Type your support query here...">
+          <button id="chatSendBtn" class="chat-send-btn" aria-label="Send query">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div id="notification" class="notification"></div>
+  
+  <button id="floatingChatBtn" class="floating-chat-btn" aria-label="Open support chat">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+    </svg>
+    <span class="chat-btn-label">Live Chat</span>
+  </button><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+
+  <script src="js/utils.js"></script>
+  <script src="js/support.js"></script>
+</body>
+</html>

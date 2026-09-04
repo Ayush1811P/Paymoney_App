@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - Cashback Offers</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="css/offers.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+      
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+      
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+  
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+  
+  <main class="dashboard-container offers-container">
+    <div class="offers-header">
+      <h2>Cashback & Offers</h2>
+      <p>Exclusive deals for your next payment</p>
+    </div>
+
+    <div class="offers-grid">
+      <!-- Offer 1 -->
+      <div class="offer-card">
+        <div class="offer-badge">New</div>
+        <div class="offer-icon">📱</div>
+        <h3>Mobile Recharge</h3>
+        <div class="offer-amount">Flat ₹50 Cashback</div>
+        <p>On your first mobile recharge of ₹199 or more.</p>
+        <div class="offer-code-container">
+          <span class="offer-code">PAYMONEY50</span>
+          <button class="btn btn-sm btn-outline copy-btn">Copy</button>
+        </div>
+      </div>
+      
+      <!-- Offer 2 -->
+      <div class="offer-card">
+        <div class="offer-icon">💡</div>
+        <h3>Electricity Bill</h3>
+        <div class="offer-amount">Up to ₹100 Off</div>
+        <p>Pay electricity bill and get up to ₹100 cashback in wallet.</p>
+        <div class="offer-code-container">
+          <span class="offer-code">ELEC100</span>
+          <button class="btn btn-sm btn-outline copy-btn">Copy</button>
+        </div>
+      </div>
+
+      <!-- Offer 3 -->
+      <div class="offer-card">
+        <div class="offer-badge hot">Hot</div>
+        <div class="offer-icon">💳</div>
+        <h3>UPI Transfer</h3>
+        <div class="offer-amount">Win Scratch Card</div>
+        <p>Send money via UPI and win scratch cards worth up to ₹500.</p>
+        <div class="offer-code-container">
+          <span class="offer-code">Auto Applied</span>
+        </div>
+      </div>
+
+      <!-- Offer 4 -->
+      <div class="offer-card">
+        <div class="offer-icon">📺</div>
+        <h3>DTH Recharge</h3>
+        <div class="offer-amount">10% Cashback</div>
+        <p>Get 10% cashback up to ₹75 on 6-month DTH packs.</p>
+        <div class="offer-code-container">
+          <span class="offer-code">DTH10</span>
+          <button class="btn btn-sm btn-outline copy-btn">Copy</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div id="notification" class="notification"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Setup simple copy to clipboard for offer codes
+      const copyBtns = document.querySelectorAll('.copy-btn');
+      copyBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const codeSpan = e.target.previousElementSibling;
+          const code = codeSpan.textContent;
+          navigator.clipboard.writeText(code).then(() => {
+            const originalText = e.target.textContent;
+            e.target.textContent = 'Copied!';
+            e.target.classList.add('copied');
+            
+            if (typeof showNotification === 'function') {
+              showNotification(`Offer code ${code} copied!`, 'success');
+            }
+            
+            setTimeout(() => {
+              e.target.textContent = originalText;
+              e.target.classList.remove('copied');
+            }, 2000);
+          });
+        });
+      });
+      
+      // Add standard auth check
+      if (typeof requireAuth === 'function') {
+        const isAuth = await requireAuth();
+        if (!isAuth) return;
+        
+        // Setup username
+        const user = await getUser();
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement && user && user.full_name) {
+          userNameElement.textContent = user.full_name;
+        }
+      }
+      
+      // Setup logout
+      const logoutBtn = document.getElementById('logoutBtn');
+      const mobileLogout = document.getElementById('mobileLogout');
+      
+      const handleLogout = (e) => {
+        e.preventDefault();
+        localStorage.removeItem('paymoney_user');
+        localStorage.removeItem('paymoney_token');
+        window.location.href = 'login.html';
+      };
+      
+      if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+      if (mobileLogout) mobileLogout.addEventListener('click', handleLogout);
+    });
+  </script>
+</body>
+</html>

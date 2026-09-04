@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - UPI Payments</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/upi.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand"
+              d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li class="active"><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+
+  <main class="upi-container">
+    <div class="upi-section">
+      <div id="upiStatusSection" class="upi-status">
+        <h2>UPI Status</h2>
+        <div id="noUpiAccount" class="upi-register">
+          <p>You don't have a UPI ID yet. Link your bank account to create one.</p>
+          <button id="setupUpiBtn" class="btn btn-primary">Set up UPI</button>
+        </div>
+
+        <div id="upiAccountSection" class="upi-active hidden">
+          <div class="upi-id-display">
+            <h3>Your UPI ID</h3>
+            <div class="upi-id">
+              <span id="upiIdDisplay">user@paymoney</span>
+              <button id="copyUpiBtn" class="btn-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                  <path fill="currentColor"
+                    d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="upi-actions">
+            <button id="sendUpiBtn" class="btn btn-primary">Send Money</button>
+            <!-- <button id="requestUpiBtn" class="btn btn-secondary">Request Money</button> -->
+          </div>
+        </div>
+      </div>
+
+      <div id="linkedBanksSection" class="linked-banks">
+        <h2>Linked Bank Accounts</h2>
+        <div id="noBankAccounts" class="no-banks">
+          <p>No bank accounts linked yet.</p>
+        </div>
+
+        <div id="bankAccountsList" class="banks-list hidden">
+          <!-- Bank accounts will be populated here by JavaScript -->
+        </div>
+
+        <button id="linkBankBtn" class="btn btn-secondary">Link New Bank Account</button>
+      </div>
+    </div>
+
+    <div class="recent-upi-transactions">
+      <h2>Recent UPI Transactions</h2>
+      <div id="upiTransactionsList" class="transactions-list">
+        <!-- UPI transactions will be populated here by JavaScript -->
+        <div class="empty-transactions">
+          <p>No UPI transactions yet</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Link Bank Account Modal -->
+  <div id="linkBankModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Link Bank Account</h2>
+      <form id="linkBankForm">
+        <div class="form-group">
+          <label for="accountNumber">Account Number</label>
+          <input type="text" id="accountNumber" required placeholder="Enter your account number">
+        </div>
+
+        <div class="form-group">
+          <label for="ifscCode">IFSC Code</label>
+          <input type="text" id="ifscCode" required placeholder="Enter IFSC code">
+        </div>
+
+        <div class="form-group">
+          <label for="accountHolderName">Account Holder Name</label>
+          <input type="text" id="accountHolderName" required placeholder="Enter account holder name">
+        </div>
+
+        <div class="form-group">
+          <label for="bankMobileNumber">Registered Mobile Number</label>
+          <input type="tel" id="bankMobileNumber" required placeholder="Enter mobile number linked with bank">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Link Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Send UPI Money Modal -->
+  <div id="sendUpiModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Send Money via UPI</h2>
+      <form id="sendUpiForm">
+        <div class="form-group">
+          <label for="recipientUpiId">UPI ID / Mobile Number</label>
+          <input type="text" id="recipientUpiId" required placeholder="Enter UPI ID or mobile number">
+        </div>
+
+        <div class="form-group">
+          <label for="upiSendAmount">Amount (₹)</label>
+          <input type="number" id="upiSendAmount" min="0.01" step="0.01" required placeholder="Enter amount">
+        </div>
+
+        <div class="form-group">
+          <label for="upiSendNote">Note (Optional)</label>
+          <input type="text" id="upiSendNote" placeholder="Add a note">
+        </div>
+
+        <div class="form-group">
+          <label>Pay From</label>
+          <div id="upiPaymentSources" class="payment-sources">
+            <!-- Payment sources will be populated here by JavaScript -->
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Pay Now</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- UPI PIN Modal -->
+  <div id="upiPinModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Enter UPI PIN</h2>
+      <div class="upi-pin-container">
+        <p>Please enter your 4-digit UPI PIN to complete the transaction</p>
+
+        <div class="upi-transaction-details">
+          <div class="detail-row">
+            <span>Paying to:</span>
+            <span id="pinRecipient"></span>
+          </div>
+          <div class="detail-row">
+            <span>Amount:</span>
+            <span id="pinAmount"></span>
+          </div>
+        </div>
+
+        <div class="pin-input-container">
+          <input type="password" id="upiPin" maxlength="4" inputmode="numeric" pattern="[0-9]*" required
+            placeholder="Enter UPI PIN">
+        </div>
+
+        <button id="confirmPinBtn" class="btn btn-primary">Confirm Payment</button>
+        <p class="pin-note">Never share your UPI PIN with anyone</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPI Setup Modal -->
+  <div id="setupUpiModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Set Up UPI</h2>
+      <div class="setup-steps">
+        <div class="setup-step active" data-step="1">
+          <h3>Step 1: Link Bank Account</h3>
+          <form id="setupBankForm">
+            <div class="form-group">
+              <label for="setupAccountNumber">Account Number</label>
+              <input type="text" id="setupAccountNumber" required placeholder="Enter your account number">
+            </div>
+
+            <div class="form-group">
+              <label for="setupIfscCode">IFSC Code</label>
+              <input type="text" id="setupIfscCode" required placeholder="Enter IFSC code">
+            </div>
+
+            <div class="form-group">
+              <label for="setupAccountHolderName">Account Holder Name</label>
+              <input type="text" id="setupAccountHolderName" required placeholder="Enter account holder name">
+            </div>
+
+            <div class="form-group">
+              <label for="setupBankMobileNumber">Registered Mobile Number</label>
+              <input type="tel" id="setupBankMobileNumber" required placeholder="Enter mobile number linked with bank">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Next</button>
+          </form>
+        </div>
+
+        <div class="setup-step" data-step="2">
+          <h3>Step 2: Create UPI ID</h3>
+          <form id="createUpiForm">
+            <div class="form-group">
+              <label for="upiPrefix">Create UPI ID</label>
+              <div class="upi-id-input">
+                <input type="text" id="upiPrefix" required placeholder="Enter username">
+                <span class="upi-suffix">@paymoney</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="setupUpiPin">Create 4-digit UPI PIN</label>
+              <input type="password" id="setupUpiPin" maxlength="4" inputmode="numeric" pattern="[0-9]*" required
+                placeholder="Create UPI PIN">
+            </div>
+
+            <div class="form-group">
+              <label for="confirmUpiPin">Confirm UPI PIN</label>
+              <input type="password" id="confirmUpiPin" maxlength="4" inputmode="numeric" pattern="[0-9]*" required
+                placeholder="Confirm UPI PIN">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create UPI ID</button>
+          </form>
+        </div>
+
+        <div class="setup-step" data-step="3">
+          <h3>UPI Setup Complete!</h3>
+          <div class="setup-success">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24" width="64" height="64">
+                <path fill="currentColor"
+                  d="M12,0A12,12,0,1,0,24,12,12,12,0,0,0,12,0Zm6.93,8.2-6.85,9.29a1,1,0,0,1-1.43.19l-4.28-3.57a1,1,0,0,1,1.27-1.53l3.48,2.9,6.18-8.39a1,1,0,1,1,1.63,1.11Z" />
+              </svg>
+            </div>
+            <p>Your UPI ID has been successfully created!</p>
+            <div class="new-upi-id">
+              <span id="newUpiId">user@paymoney</span>
+            </div>
+            <p class="pin-note">Remember your UPI PIN for all future transactions.</p>
+            <button id="completeSetupBtn" class="btn btn-primary">Start Using UPI</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- UPI Payment Success Modal -->
+    <div id="upiSuccessModal" class="modal" style="display: none;">
+      <div class="modal-content success-modal" id="upiSuccessModalContent">
+        <div class="success-icon"
+          style="color: var(--success-color); margin-bottom: var(--spacing-md); text-align: center;">
+          <svg viewBox="0 0 24 24" width="64" height="64" style="fill: currentColor;">
+            <path
+              d="M12,0A12,12,0,1,0,24,12,12,12,0,0,0,12,0Zm6.93,8.2-6.85,9.29a1,1,0,0,1-1.43.19l-4.28-3.57a1,1,0,0,1,1.27-1.53l3.48,2.9,6.18-8.39a1,1,0,1,1,1.63,1.11Z" />
+          </svg>
+        </div>
+        <h2 style="color: var(--text-dark); margin-bottom: var(--spacing-sm); font-weight: 700; text-align: center;">
+          Payment Successful!</h2>
+        <div class="success-details"
+          style="background: var(--bg-grey); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-lg); border: 1px solid var(--border-color);">
+          <p
+            style="color: var(--text-medium); margin-bottom: var(--spacing-md); font-size: 0.95rem; text-align: center;">
+            Your payment has been successfully processed.</p>
+          <div class="detail-row"
+            style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem;">
+            <span style="color: var(--text-medium);">To:</span>
+            <span id="successUpiRecipient" style="font-weight: 600; color: var(--text-dark);"></span>
+          </div>
+          <div class="detail-row"
+            style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem;">
+            <span style="color: var(--text-medium);">Amount:</span>
+            <span id="successUpiAmount" style="font-weight: 600; color: var(--text-dark);"></span>
+          </div>
+          <div class="detail-row"
+            style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem;">
+            <span style="color: var(--text-medium);">Transaction ID:</span>
+            <span id="upiTransactionId" style="font-family: monospace; color: var(--text-dark);"></span>
+          </div>
+          <div class="detail-row"
+            style="display: flex; justify-content: space-between; margin-bottom: 0; font-size: 0.95rem;">
+            <span style="color: var(--text-medium);">Date & Time:</span>
+            <span id="upiTransactionTime" style="color: var(--text-dark);"></span>
+          </div>
+        </div>
+        <div class="success-actions" style="display: flex; gap: var(--spacing-md); justify-content: center;">
+          <button id="downloadUpiReceiptBtn" class="btn btn-outline" style="flex: 1;">Download Receipt</button>
+          <button id="closeUpiSuccessBtn" class="btn btn-primary" style="flex: 1;">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="notification" class="notification"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
+
+    <script src="js/utils.js"></script>
+    <script src="js/upi.js"></script>
+</body>
+
+</html>

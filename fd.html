@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - FD Account</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="css/fd.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+      
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+      
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+  
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+
+  <main class="dashboard-container fd-container" id="fdMainView">
+    <div class="page-header" style="text-align: center; margin-bottom: var(--spacing-xl);">
+      <h2 style="font-size: var(--font-size-xxl); margin-bottom: var(--spacing-sm);">FD Account</h2>
+      <p style="color: var(--text-medium);">Grow your savings with fixed-term plans.</p>
+    </div>
+
+    <!-- State 1: Overview / Active Plans -->
+    <div id="fdOverviewSection">
+      <!-- Active Plans will be injected here -->
+      <div id="activePlansContainer"></div>
+      
+      <div class="empty-state" id="noPlansState">
+        <h3 style="margin-bottom: var(--spacing-sm);">Start your savings journey</h3>
+        <p style="color: var(--text-medium); margin-bottom: var(--spacing-lg);">Choose a plan, deposit an amount, and track your estimated returns until maturity.</p>
+        <button class="btn btn-primary" id="explorePlansBtn">Explore Plans</button>
+      </div>
+    </div>
+
+    <!-- State 2: Explore Plans -->
+    <div id="fdExploreSection" style="display: none;">
+      <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+        <h3 style="margin: 0;">Available Plans</h3>
+        <button class="btn btn-outline btn-sm" id="backToOverviewBtn" style="padding: 4px 12px; font-size: 14px;">Back</button>
+      </div>
+      <p class="disclaimer-text" style="font-size: 12px; color: var(--text-light); margin-bottom: var(--spacing-lg);">Illustrative rates shown for demonstration purposes only. Actual rates and product availability may vary.</p>
+      
+      <div class="fd-plans-grid" id="fdPlansGrid">
+        <!-- Plans will be injected here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Plan Selection / Calculator -->
+  <div id="planSelectionModal" class="modal">
+    <div class="modal-content fd-modal">
+      <span class="close-modal" id="closeCalcModal">&times;</span>
+      <h2 id="calcPlanName" style="margin-bottom: var(--spacing-sm);">Plan Details</h2>
+      <div class="plan-summary-bar">
+        <div>
+          <span class="label">Duration</span>
+          <span class="value" id="calcPlanDuration">12 Months</span>
+        </div>
+        <div>
+          <span class="label">Interest Rate</span>
+          <span class="value" id="calcPlanRate">6.0% p.a.</span>
+        </div>
+        <div>
+          <span class="label">Min Deposit</span>
+          <span class="value" id="calcPlanMin">₹500</span>
+        </div>
+      </div>
+      
+      <form id="calculatorForm">
+        <div class="form-group">
+          <label for="calcAmount">How much would you like to save?</label>
+          <div class="input-with-icon" style="position: relative;">
+            <span class="currency-symbol" style="position: absolute; left: 12px; top: 12px; font-weight: bold;">₹</span>
+            <input type="number" id="calcAmount" min="500" step="100" placeholder="e.g. 10000" style="padding-left: 30px;" required>
+          </div>
+          <small class="error-msg" id="calcError" style="color: var(--error-color); display: none; margin-top: 4px;">Invalid amount</small>
+        </div>
+      </form>
+
+      <div class="returns-calculator-box">
+        <div class="calc-row">
+          <span>You save</span>
+          <strong id="displayPrincipal">₹0</strong>
+        </div>
+        <div class="calc-row">
+          <span>Estimated interest</span>
+          <strong class="text-success" id="displayInterest">₹0</strong>
+        </div>
+        <div class="calc-divider"></div>
+        <div class="calc-row maturity-row">
+          <span>Maturity value</span>
+          <strong id="displayMaturity">₹0</strong>
+        </div>
+        <div class="calc-row date-row">
+          <span>Estimated Maturity Date</span>
+          <span id="displayMaturityDate">-</span>
+        </div>
+      </div>
+      
+      <button type="button" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-lg);" id="proceedToReviewBtn">Proceed to Review</button>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmation -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content fd-modal">
+      <span class="close-modal" id="closeConfirmModal">&times;</span>
+      <h2 style="margin-bottom: var(--spacing-md);">Review your plan</h2>
+      
+      <div class="review-details">
+        <div class="review-row">
+          <span class="label">Plan</span>
+          <strong id="reviewPlanName">Smart</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Duration</span>
+          <strong id="reviewDuration">12 Months</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Deposit</span>
+          <strong id="reviewDeposit">₹10,000</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Interest rate</span>
+          <strong id="reviewRate">6.0% p.a.</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Estimated interest</span>
+          <strong class="text-success" id="reviewInterest">₹600</strong>
+        </div>
+        <div class="review-divider"></div>
+        <div class="review-row maturity-row">
+          <span class="label">Estimated maturity</span>
+          <strong id="reviewMaturity">₹10,600</strong>
+        </div>
+        <div class="review-row date-row">
+          <span class="label">Maturity date</span>
+          <strong id="reviewMaturityDate">02 Sep 2027</strong>
+        </div>
+      </div>
+      
+      <div class="demo-warning">
+        ⚠️ This is a demonstration/prototype. No real deposit or financial transaction will be processed.
+      </div>
+      
+      <div class="btn-group" style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+        <button type="button" class="btn btn-outline" style="flex: 1;" id="backToCalcBtn">Go Back</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" id="confirmPlanBtn">Confirm Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: FD Details -->
+  <div id="fdDetailsModal" class="modal">
+    <div class="modal-content fd-modal">
+      <span class="close-modal" id="closeDetailsModal">&times;</span>
+      <h2 style="margin-bottom: var(--spacing-md);">Plan Details</h2>
+      
+      <div class="status-banner" id="detailsStatusBanner">
+        Active
+      </div>
+      
+      <div class="review-details" style="margin-top: var(--spacing-md);">
+        <div class="review-row">
+          <span class="label">FD ID</span>
+          <span class="value text-mono" id="detailsId">FD-...</span>
+        </div>
+        <div class="review-row">
+          <span class="label">Plan</span>
+          <strong id="detailsPlanName">Smart</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Principal amount</span>
+          <strong id="detailsPrincipal">₹10,000</strong>
+        </div>
+        <div class="review-row">
+          <span class="label">Interest rate</span>
+          <span class="value" id="detailsRate">6.0% p.a.</span>
+        </div>
+        <div class="review-row">
+          <span class="label">Estimated interest</span>
+          <strong class="text-success" id="detailsInterest">₹600</strong>
+        </div>
+        <div class="review-divider"></div>
+        <div class="review-row maturity-row">
+          <span class="label">Estimated maturity value</span>
+          <strong id="detailsMaturity">₹10,600</strong>
+        </div>
+      </div>
+
+      <div class="timeline-section" style="margin-top: var(--spacing-lg);">
+        <h3 style="margin-bottom: var(--spacing-sm); font-size: 16px;">Plan Timeline</h3>
+        <div class="timeline">
+          <div class="timeline-point start">
+            <div class="point-marker"></div>
+            <div class="point-content">
+              <h4 style="margin:0; font-size: 14px;">Start</h4>
+              <p id="detailsStartDate" style="margin:0; font-size: 12px; color: var(--text-light);">01 Jan 2026</p>
+            </div>
+          </div>
+          <div class="timeline-line">
+            <div class="timeline-progress" id="detailsTimelineProgress" style="height: 50%;"></div>
+          </div>
+          <div class="timeline-point current" id="detailsCurrentPoint">
+            <div class="point-marker"></div>
+            <div class="point-content">
+              <h4 style="margin:0; font-size: 14px;">Current</h4>
+              <p style="margin:0; font-size: 12px; color: var(--text-light);">Today</p>
+            </div>
+          </div>
+          <div class="timeline-point end">
+            <div class="point-marker"></div>
+            <div class="point-content">
+              <h4 style="margin:0; font-size: 14px;">Maturity</h4>
+              <p id="detailsMaturityDate" style="margin:0; font-size: 12px; color: var(--text-light);">01 Jan 2027</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="matured-actions" id="maturedActions" style="display: none; margin-top: var(--spacing-lg);">
+        <button class="btn btn-primary" style="width: 100%;" id="startNewPlanBtn">Start New Plan</button>
+      </div>
+
+      <div class="active-actions" id="activeActions" style="margin-top: var(--spacing-lg);">
+        <button class="btn btn-outline" style="width: 100%; color: var(--error-color); border-color: var(--error-color);" id="initiateCancelBtn">Cancel Plan</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal: Cancel FD Confirmation -->
+  <div id="cancelFdModal" class="modal">
+    <div class="modal-content fd-modal">
+      <span class="close-modal" id="closeCancelModal">&times;</span>
+      <h2 style="margin-bottom: var(--spacing-md); color: var(--error-color);">Cancel FD Plan</h2>
+      
+      <div class="demo-warning" style="border-color: var(--error-color); background-color: var(--error-light); color: var(--error-dark); margin-bottom: var(--spacing-lg); text-align: left;">
+        <strong>Warning:</strong> Canceling this FD before maturity will forfeit all estimated interest. You will only receive your principal deposit (₹<span id="cancelPrincipalAmount">0</span>) back in your wallet.
+      </div>
+      
+      <div class="btn-group" style="display: flex; gap: var(--spacing-sm);">
+        <button type="button" class="btn btn-outline" style="flex: 1;" id="abortCancelBtn">Keep Plan</button>
+        <button type="button" class="btn btn-primary" style="flex: 1; background-color: var(--error-color);" id="confirmCancelBtn">Yes, Cancel Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/fd.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+/**
+ * Dynamic CSS Logo Styling for PAYMONEY
+ */
+
+.paymoney-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.paymoney-logo:hover {
+  text-decoration: none;
+  transform: scale(1.02);
+}
+
+/* SVG Logo Icon */
+.logo-icon-svg {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+.logo-icon-svg .cuff {
+  fill: #00BDF5; /* Light cyan cuff */
+}
+
+.logo-icon-svg .cuff-button {
+  fill: #FFFFFF;
+}
+
+.logo-icon-svg .card-body {
+  fill: url(#cardGradient);
+  stroke: #0A2540; /* Dark blue outline */
+  stroke-width: 2.5px;
+}
+
+.logo-icon-svg .card-stripe {
+  fill: #0A2540;
+}
+
+.logo-icon-svg .card-chip {
+  fill: #E6F0FA;
+}
+
+.logo-icon-svg .hand {
+  fill: #FFFFFF;
+  stroke: #0A2540; /* Dark blue outline */
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Logo Typography */
+.logo-text-css {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.logo-text-css .pay-part {
+  color: #0A2540; /* Dark blue */
+}
+
+.logo-text-css .money-part {
+  color: #00BDF5; /* Cyan */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-icon-svg {
+    height: 38px;
+  }
+  .logo-text-css {
+    font-size: 20px;
+  }
+}
+
+.logo .paymoney-logo {
+  justify-content: center;
+}

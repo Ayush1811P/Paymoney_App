@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAYMONEY - Broadband Bill Payment</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/recharge.css">
+  <link rel="stylesheet" href="css/logo.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo">
+        <a href="dashboard.html" class="paymoney-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0080ff" />
+                <stop offset="100%" stop-color="#00bfff" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-10 50 35)">
+              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
+              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
+              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
+              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
+              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
+            </g>
+            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
+            <circle class="cuff-button" cx="15" cy="44" r="2" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
+          </svg>
+          <span class="logo-text-css">
+            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
+          </span>
+        </a>
+      </div>
+      
+      <div class="user-menu">
+        <a href="profile.html" class="user-profile">
+          <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
+          <span id="userName">User</span>
+        </a>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
+      </div>
+      
+      <div class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </header>
+  
+  <nav class="main-nav">
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li class="active"><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+  
+  <div class="mobile-menu">
+    <ul>
+      <li><a href="dashboard.html">Wallet</a></li>
+      <li><a href="upi.html">UPI</a></li>
+      <li><a href="recharge.html">Recharge</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="mobileLogout">Logout</a></li>
+    </ul>
+  </div>
+  
+  <main class="recharge-container">
+    <div class="services-subnav">
+      <a href="recharge.html" class="subnav-item">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+        </svg>
+        <span>Mobile</span>
+      </a>
+      <a href="dth.html" class="subnav-item">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
+          <path d="M6 13h12v2H6zm0-4h8v2H6z"/>
+        </svg>
+        <span>DTH</span>
+      </a>
+      <a href="electricity.html" class="subnav-item">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+        </svg>
+        <span>Electricity</span>
+      </a>
+      <a href="broadband.html" class="subnav-item active">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.36 10.04C18.61 8.3 17.25 6.9 15.54 6.09L15.54 6.08c-2.18-1.04-4.83-1.04-7.01 0l-.02.01C6.79 6.9 5.42 8.3 4.67 10.04L4.66 10.05c-.79 1.83-.89 3.86-.33 5.73.18.6.77.96 1.37.78.6-.18.96-.77.78-1.37-.44-1.46-.36-3.05.25-4.49.59-1.37 1.66-2.47 3.01-3.11c1.72-.82 3.81-.82 5.53 0 1.35.64 2.42 1.74 3.01 3.11.61 1.44.69 3.03.25 4.49-.18.6.18 1.19.78 1.37.6.18 1.19-.18 1.37-.78.56-1.87.46-3.9-.33-5.73zM12 13c-1.66 0-3 1.34-3 3 0 .83.34 1.58.88 2.12l.02.02c.54.54 1.29.86 2.1.86s1.56-.32 2.1-.86l.02-.02c.54-.54.88-1.29.88-2.12 0-1.66-1.34-3-3-3z"/>
+        </svg>
+        <span>Broadband</span>
+      </a>
+    </div>
+    
+    <div class="recharge-card">
+      <h2>Broadband Bill Payment</h2>
+      
+      <div class="recharge-form">
+        <div class="form-group">
+          <label for="broadbandOperator">Broadband Provider</label>
+          <select id="broadbandOperator" required>
+            <option value="" disabled selected>Select Provider</option>
+            <option value="airtel">Airtel Xstream Fiber</option>
+            <option value="jio">JioFiber</option>
+            <option value="act">ACT Fibernet</option>
+            <option value="bsnl">BSNL Broadband</option>
+            <option value="tataplay">Tata Play Fiber</option>
+            <option value="hathway">Hathway</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="accountId">Billing Account Number / User ID</label>
+          <input type="text" id="accountId" placeholder="Enter Billing Account Number" required>
+        </div>
+        
+        <button id="viewPlansBtn" class="btn btn-secondary">View Plans</button>
+      </div>
+    </div>
+    
+    <div id="plansContainer" class="plans-container hidden">
+      <div class="plans-header">
+        <h3>Internet Subscription Plans</h3>
+        <div class="plans-tabs">
+          <button class="plan-tab active" data-category="monthly">Monthly</button>
+          <button class="plan-tab" data-category="quarterly">Quarterly</button>
+          <button class="plan-tab" data-category="halfyearly">6-Month Packs</button>
+          <button class="plan-tab" data-category="annual">Annual Packs</button>
+        </div>
+      </div>
+      
+      <div id="plansList" class="plans-list">
+        <!-- Plans will be populated here by JavaScript -->
+      </div>
+    </div>
+    
+    <div id="rechargeConfirmation" class="recharge-confirmation hidden">
+      <div class="confirmation-header">
+        <h3>Confirm Broadband Payment</h3>
+      </div>
+      
+      <div class="confirmation-details">
+        <div class="detail-row">
+          <span>Account ID:</span>
+          <span id="confirmAccountId"></span>
+        </div>
+        <div class="detail-row">
+          <span>Provider:</span>
+          <span id="confirmOperator"></span>
+        </div>
+        <div class="detail-row">
+          <span>Plan Speed & Type:</span>
+          <span id="confirmPlan"></span>
+        </div>
+        <div class="detail-row total">
+          <span>Amount:</span>
+          <span id="confirmAmount"></span>
+        </div>
+      </div>
+      
+      <div class="confirmation-actions">
+        <button id="cancelRechargeBtn" class="btn btn-outline">Cancel</button>
+        <button id="confirmRechargeBtn" class="btn btn-primary">Confirm & Pay</button>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Broadband Success Modal -->
+  <div id="rechargeSuccessModal" class="modal">
+    <div class="modal-content success-modal">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" width="64" height="64">
+          <path fill="currentColor" d="M12,0A12,12,0,1,0,24,12,12,12,0,0,0,12,0Zm6.93,8.2-6.85,9.29a1,1,0,0,1-1.43.19l-4.28-3.57a1,1,0,0,1,1.27-1.53l3.48,2.9,6.18-8.39a1,1,0,1,1,1.63,1.11Z"/>
+        </svg>
+      </div>
+      <h2>Payment Successful!</h2>
+      <div class="success-details">
+        <p>Your Broadband bill payment has been successfully processed.</p>
+        <div class="detail-row">
+          <span>Account ID:</span>
+          <span id="successAccountId"></span>
+        </div>
+        <div class="detail-row">
+          <span>Provider:</span>
+          <span id="successOperator"></span>
+        </div>
+        <div class="detail-row">
+          <span>Amount Paid:</span>
+          <span id="successAmount"></span>
+        </div>
+        <div class="detail-row">
+          <span>Transaction ID:</span>
+          <span id="transactionId"></span>
+        </div>
+        <div class="detail-row">
+          <span>Date & Time:</span>
+          <span id="transactionTime"></span>
+        </div>
+      </div>
+      <div class="success-actions">
+        <button id="downloadReceiptBtn" class="btn btn-outline">Download Receipt</button>
+        <button id="closeSuccessBtn" class="btn btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  
+  <script src="js/utils.js"></script>
+  <script src="js/broadband.js"></script>
+</body>
+</html>

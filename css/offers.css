@@ -1,0 +1,124 @@
+.offers-container {
+  padding-top: var(--spacing-xl);
+}
+
+.offers-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.offers-header h2 {
+  color: var(--primary-dark);
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-xs);
+}
+
+.offers-header p {
+  color: var(--text-light);
+  font-size: var(--font-size-md);
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xxl);
+}
+
+.offer-card {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+
+.offer-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--success-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+.offer-badge.hot {
+  background: var(--accent-color);
+}
+
+.offer-icon {
+  font-size: 40px;
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-light);
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--primary-color);
+}
+
+.offer-card h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-dark);
+}
+
+.offer-amount {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.offer-card p {
+  color: var(--text-medium);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+  flex-grow: 1;
+}
+
+.offer-code-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-light);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  border: 1px dashed var(--border-dark);
+}
+
+.offer-code {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--secondary-dark);
+  font-size: var(--font-size-md);
+  letter-spacing: 1px;
+}
+
+.copy-btn {
+  padding: 4px 12px;
+  font-size: var(--font-size-xs);
+}
+
+.copy-btn.copied {
+  background-color: var(--success-color);
+  color: white;
+  border-color: var(--success-color);
+}

@@ -1,0 +1,282 @@
+.upi-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg) var(--spacing-xl);
+}
+
+.upi-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.upi-status, .linked-banks {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.upi-status h2, .linked-banks h2, .recent-upi-transactions h2 {
+  color: var(--secondary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.upi-register {
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+.upi-register p {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-medium);
+}
+
+.upi-active {
+  padding: var(--spacing-md) 0;
+}
+
+.upi-id-display {
+  margin-bottom: var(--spacing-md);
+}
+
+.upi-id-display h3 {
+  font-size: var(--font-size-md);
+  color: var(--text-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.upi-id {
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-light);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+}
+
+.upi-id span {
+  flex: 1;
+  font-weight: 500;
+  color: var(--primary-dark);
+}
+
+.upi-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.upi-actions .btn {
+  flex: 1;
+}
+
+/* Linked Banks */
+.no-banks {
+  text-align: center;
+  padding: var(--spacing-md) 0;
+  color: var(--text-medium);
+}
+
+.banks-list {
+  margin-bottom: var(--spacing-md);
+}
+
+.bank-account {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.bank-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: var(--spacing-md);
+  background-color: var(--bg-grey);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-medium);
+}
+
+.bank-details {
+  flex: 1;
+}
+
+.bank-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.bank-account-number {
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+}
+
+.bank-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* UPI Transactions */
+.recent-upi-transactions {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* UPI Setup */
+.setup-steps {
+  max-width: 100%;
+}
+
+.setup-step {
+  display: none;
+}
+
+.setup-step.active {
+  display: block;
+}
+
+.setup-step h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--secondary-color);
+}
+
+.upi-id-input {
+  display: flex;
+  align-items: center;
+}
+
+.upi-id-input input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.upi-suffix {
+  background-color: var(--bg-grey);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-left: none;
+  border-top-right-radius: var(--border-radius-md);
+  border-bottom-right-radius: var(--border-radius-md);
+  color: var(--text-medium);
+  font-size: var(--font-size-md);
+}
+
+.setup-success {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.new-upi-id {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin: var(--spacing-md) 0;
+  font-weight: 500;
+  font-size: var(--font-size-lg);
+}
+
+.pin-note {
+  color: var(--text-light);
+  font-size: var(--font-size-sm);
+  margin: var(--spacing-md) 0;
+}
+
+/* UPI PIN Modal */
+.upi-pin-container {
+  text-align: center;
+}
+
+.upi-transaction-details {
+  background-color: var(--bg-grey);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin: var(--spacing-md) 0;
+}
+
+.pin-input-container {
+  margin: var(--spacing-lg) 0;
+}
+
+.pin-input-container input {
+  text-align: center;
+  letter-spacing: 8px;
+  font-size: var(--font-size-lg);
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+/* Payment Sources */
+.payment-sources {
+  margin-bottom: var(--spacing-md);
+}
+
+.payment-source {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.payment-source.selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
+}
+
+.payment-source-radio {
+  margin-right: var(--spacing-sm);
+}
+
+.payment-source-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: var(--spacing-sm);
+  background-color: var(--bg-grey);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-medium);
+  font-size: var(--font-size-xs);
+}
+
+.payment-source-details {
+  flex: 1;
+}
+
+.payment-source-name {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+}
+
+.payment-source-info {
+  font-size: var(--font-size-xs);
+  color: var(--text-light);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .upi-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .upi-actions {
+    flex-direction: column;
+  }
+  
+  .upi-actions .btn {
+    width: 100%;
+  }
+}
