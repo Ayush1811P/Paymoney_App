@@ -1117,7 +1117,7 @@ function injectUpiModals() {
       <!-- Wrong PIN Modal -->
       <div id="wrongPinModal" class="upi-global-modal" style="display: none; text-align: center;">
         <div class="upi-global-header" style="justify-content: center; position: relative;">
-          <h3 style="color: var(--error-color); margin: 0;">Wrong PIN</h3>
+          <h3 style="color: var(--error-color); margin: 0;">wrong pin</h3>
           <button class="upi-global-close" onclick="closeUpiModals()" style="position: absolute; right: 0; top: -5px;">&times;</button>
         </div>
         <div class="upi-global-body">
@@ -1299,7 +1299,7 @@ async function submitUpiPin() {
       if (wrongPinModal) {
         wrongPinModal.style.display = 'block';
       } else {
-        showNotification('Incorrect UPI PIN', 'error');
+        showNotification('wrong pin', 'error', 'top-center');
       }
       clearUpiPin();
       return;
@@ -1313,7 +1313,7 @@ async function submitUpiPin() {
     }
   } catch (error) {
     console.error('Transaction error:', error);
-    showNotification('Error: ' + (error.message || 'Transaction failed'), 'error');
+    showNotification('Error: ' + (error.message || 'Transaction failed'), 'error', 'top-center');
     closeUpiModals();
   }
 }

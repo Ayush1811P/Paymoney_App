@@ -272,40 +272,42 @@ async function confirmFdPlan() {
     return;
   }
   
-  const fdId = 'FD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-  
-  const newFd = {
-    id: fdId,
-    planId: activePlanSelection.id,
-    planName: activePlanSelection.name,
-    duration: activePlanSelection.duration,
-    rate: activePlanSelection.rate,
-    principal: calculatedDetails.principal,
-    interest: calculatedDetails.interest,
-    maturityValue: calculatedDetails.maturityValue,
-    startDate: calculatedDetails.startDate.toISOString(),
-    maturityDate: calculatedDetails.maturityDate.toISOString(),
-    status: 'active'
-  };
-  
-  saveFd(newFd);
-  
-  // Deduct balance and add transaction
-  const newBalance = profile.wallet_balance - calculatedDetails.principal;
-  await updateWalletBalance(newBalance);
-  await addTransaction(calculatedDetails.principal, 'FD_DEPOSIT', `FD Deposit: ${activePlanSelection.name} Plan`);
-  
-  // Try to update UI balance if on dashboard
-  if (typeof updateUserInfo === 'function') {
-    await updateUserInfo();
-  }
-  
-  document.getElementById('confirmationModal').style.display = 'none';
-  document.getElementById('fdExploreSection').style.display = 'none';
-  document.getElementById('fdOverviewSection').style.display = 'block';
-  
-  showNotification('FD Account created successfully');
-  loadFdDashboard();
+  requireUpiVerification(calculatedDetails.principal, async () => {
+    const fdId = 'FD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    
+    const newFd = {
+      id: fdId,
+      planId: activePlanSelection.id,
+      planName: activePlanSelection.name,
+      duration: activePlanSelection.duration,
+      rate: activePlanSelection.rate,
+      principal: calculatedDetails.principal,
+      interest: calculatedDetails.interest,
+      maturityValue: calculatedDetails.maturityValue,
+      startDate: calculatedDetails.startDate.toISOString(),
+      maturityDate: calculatedDetails.maturityDate.toISOString(),
+      status: 'active'
+    };
+    
+    saveFd(newFd);
+    
+    // Deduct balance and add transaction
+    const newBalance = profile.wallet_balance - calculatedDetails.principal;
+    await updateWalletBalance(newBalance);
+    await addTransaction(calculatedDetails.principal, 'FD_DEPOSIT', `FD Deposit: ${activePlanSelection.name} Plan`);
+    
+    // Try to update UI balance if on dashboard
+    if (typeof updateUserInfo === 'function') {
+      await updateUserInfo();
+    }
+    
+    document.getElementById('confirmationModal').style.display = 'none';
+    document.getElementById('fdExploreSection').style.display = 'none';
+    document.getElementById('fdOverviewSection').style.display = 'block';
+    
+    showNotification('FD Account created successfully');
+    loadFdDashboard();
+  });
 }
 
 function renderActiveFds(fds, container) {
