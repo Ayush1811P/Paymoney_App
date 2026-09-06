@@ -412,7 +412,7 @@ async function handleLogin(e) {
   btn.disabled = true;
   
   try {
-    await sendEmailOtp(data.email, 'Login');
+    await sendEmailOtp(activeUser.email, 'Login');
   } catch (error) {
     showNotification(error.message, 'error');
     btn.textContent = originalText;
