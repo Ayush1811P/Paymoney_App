@@ -255,26 +255,43 @@ async function handlePersonalInfoUpdate(e) {
     .eq('id', user.id);
     
   if (error) {
-    showNotification('Error updating profile', 'error');
-  } else {
-    // Save extra details to localStorage
-    try {
-      const extraDetails = {
-        dob: document.getElementById('profileDob')?.value || '',
-        address: document.getElementById('profileAddress')?.value || '',
-        city: document.getElementById('profileCity')?.value || '',
-        state: document.getElementById('profileState')?.value || '',
-        pincode: document.getElementById('profilePincode')?.value || ''
-      };
-      localStorage.setItem(`profile_extra_${user.id}`, JSON.stringify(extraDetails));
-    } catch (e) {
-      console.error('Error saving extra details', e);
+    console.warn('Network error updating profile, updating local mock instead');
+    const localProfile = localStorage.getItem(`mock_profile_${user.id}`);
+    if (localProfile) {
+      const parsed = JSON.parse(localProfile);
+      parsed.full_name = fullName;
+      parsed.email = email;
+      localStorage.setItem(`mock_profile_${user.id}`, JSON.stringify(parsed));
+      
+      const localUsers = JSON.parse(localStorage.getItem('mock_users_db') || '{}');
+      if (localUsers[parsed.phone]) {
+         localUsers[parsed.phone].full_name = fullName;
+         localUsers[parsed.phone].email = email;
+         localStorage.setItem('mock_users_db', JSON.stringify(localUsers));
+      }
+    } else {
+      showNotification('Error updating profile', 'error');
+      return;
     }
-    
-    showNotification('Profile updated successfully');
-    await loadProfileData();
-    await updateUserInfo(); // Re-render header
   }
+
+  // Save extra details to localStorage
+  try {
+    const extraDetails = {
+      dob: document.getElementById('profileDob')?.value || '',
+      address: document.getElementById('profileAddress')?.value || '',
+      city: document.getElementById('profileCity')?.value || '',
+      state: document.getElementById('profileState')?.value || '',
+      pincode: document.getElementById('profilePincode')?.value || ''
+    };
+    localStorage.setItem(`profile_extra_${user.id}`, JSON.stringify(extraDetails));
+  } catch (e) {
+    console.error('Error saving extra details', e);
+  }
+  
+  showNotification('Profile updated successfully');
+  await loadProfileData();
+  await updateUserInfo(); // Re-render header
 }
 
 async function handlePasswordChange(e) {

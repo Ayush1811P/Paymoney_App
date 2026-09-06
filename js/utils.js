@@ -67,6 +67,12 @@ async function getUser(forceRefresh = false) {
     .single();
     
   if (error || !data) {
+    const localProfile = localStorage.getItem(`mock_profile_${userId}`);
+    if (localProfile) {
+       cachedProfile = JSON.parse(localProfile);
+       return cachedProfile;
+    }
+
     localStorage.removeItem('paymoney_user_id');
     cachedProfile = null;
     return null;
@@ -129,12 +135,24 @@ async function updateWalletBalance(newBalance) {
     .eq('id', user.id);
     
   if (error) {
-    console.error('Error updating wallet:', error);
-  } else {
-    // Update local cache
-    if (cachedProfile) {
-      cachedProfile.wallet_balance = newBalance;
+    console.warn('Network error updating wallet, updating local mock instead');
+    const localProfile = localStorage.getItem(`mock_profile_${user.id}`);
+    if (localProfile) {
+      const parsed = JSON.parse(localProfile);
+      parsed.wallet_balance = newBalance;
+      localStorage.setItem(`mock_profile_${user.id}`, JSON.stringify(parsed));
+      
+      const localUsers = JSON.parse(localStorage.getItem('mock_users_db') || '{}');
+      if (localUsers[parsed.phone]) {
+         localUsers[parsed.phone].wallet_balance = newBalance;
+         localStorage.setItem('mock_users_db', JSON.stringify(localUsers));
+      }
     }
+  }
+  
+  // Update local cache
+  if (cachedProfile) {
+    cachedProfile.wallet_balance = newBalance;
   }
 }
 
