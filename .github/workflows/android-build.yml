@@ -34,3 +34,13 @@ jobs:
         with:
           name: paymoney-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
+
+      - name: Push APK to branch
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git checkout -B apk-release
+          cp android/app/build/outputs/apk/debug/app-debug.apk ./PayMoney_fixed.apk
+          git add PayMoney_fixed.apk
+          git commit -m "Auto-build APK"
+          git push origin apk-release -f
