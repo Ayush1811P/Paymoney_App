@@ -351,7 +351,7 @@ async function handleLogin(e) {
   // Show loading/notification
   const btn = document.getElementById('loginBtn');
   const originalText = btn.textContent;
-  btn.textContent = 'Sending OTP...';
+  btn.innerHTML = '<span class="btn-spinner"></span> Please wait...';
   btn.disabled = true;
   
   try {
@@ -440,7 +440,7 @@ async function handleRegister(e) {
     
     const btn = document.getElementById('registerBtn');
     const originalText = btn.textContent;
-    btn.textContent = 'Sending OTP...';
+    btn.innerHTML = '<span class="btn-spinner"></span> Please wait...';
     btn.disabled = true;
     
     try {

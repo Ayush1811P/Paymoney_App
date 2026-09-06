@@ -259,6 +259,12 @@ async function handleLogout(e) {
 
 // Update user info in header
 function getAvatarUrl(profile) {
+  if (profile) {
+    try {
+      const localAvatar = localStorage.getItem(`profile_avatar_${profile.id}`);
+      if (localAvatar) return localAvatar;
+    } catch(e) {}
+  }
   if (profile && profile.avatar_url) {
     return profile.avatar_url;
   }
@@ -1107,6 +1113,21 @@ function injectUpiModals() {
           </div>
         </div>
       </div>
+
+      <!-- Wrong PIN Modal -->
+      <div id="wrongPinModal" class="upi-global-modal" style="display: none; text-align: center;">
+        <div class="upi-global-header" style="justify-content: center; position: relative;">
+          <h3 style="color: var(--error-color); margin: 0;">Wrong PIN</h3>
+          <button class="upi-global-close" onclick="closeUpiModals()" style="position: absolute; right: 0; top: -5px;">&times;</button>
+        </div>
+        <div class="upi-global-body">
+          <div style="font-size: 3rem; color: var(--error-color); margin: 20px 0;">
+            <svg viewBox="0 0 24 24" style="width: 64px; height: 64px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </div>
+          <p style="margin-bottom: 20px; color: var(--text-medium);">The UPI PIN you entered is incorrect. Please try again.</p>
+          <button class="btn btn-primary" onclick="retryUpiPin()" style="width: 100%;">Try Again</button>
+        </div>
+      </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', html);
@@ -1119,7 +1140,15 @@ function closeUpiModals() {
     document.getElementById('addBankModal').style.display = 'none';
     document.getElementById('setUpiModal').style.display = 'none';
     document.getElementById('enterUpiModal').style.display = 'none';
+    const wrongPinModal = document.getElementById('wrongPinModal');
+    if (wrongPinModal) wrongPinModal.style.display = 'none';
   }
+}
+
+function retryUpiPin() {
+  document.getElementById('wrongPinModal').style.display = 'none';
+  document.getElementById('enterUpiModal').style.display = 'block';
+  clearUpiPin();
 }
 
 async function requireUpiVerification(amount, onSuccess) {
@@ -1265,7 +1294,13 @@ async function submitUpiPin() {
     const hashedInputPin = await hashPassword(pinValue);
 
     if (user.upi_pin !== hashedInputPin) {
-      showNotification('Incorrect UPI PIN', 'error');
+      document.getElementById('enterUpiModal').style.display = 'none';
+      const wrongPinModal = document.getElementById('wrongPinModal');
+      if (wrongPinModal) {
+        wrongPinModal.style.display = 'block';
+      } else {
+        showNotification('Incorrect UPI PIN', 'error');
+      }
       clearUpiPin();
       return;
     }

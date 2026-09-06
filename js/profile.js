@@ -220,22 +220,18 @@ function initAvatarChange() {
       saveAvatarBtn.textContent = 'Saving...';
       
       const user = await getUser();
-      const { error } = await supabaseClient
-        .from('profiles')
-        .update({ avatar_url: base64Image })
-        .eq('id', user.id);
-        
-      if (error) {
-        showNotification('Error uploading photo: ' + error.message, 'error');
-        saveAvatarBtn.disabled = false;
-        saveAvatarBtn.textContent = 'Save Photo';
-      } else {
+      try {
+        localStorage.setItem(`profile_avatar_${user.id}`, base64Image);
         showNotification('Profile picture updated successfully');
         avatarModal.style.display = 'none';
         saveAvatarBtn.textContent = 'Save Photo';
         saveAvatarBtn.disabled = true;
         await loadProfileData();
         await updateUserInfo();
+      } catch (error) {
+        showNotification('Error saving photo locally', 'error');
+        saveAvatarBtn.disabled = false;
+        saveAvatarBtn.textContent = 'Save Photo';
       }
     });
   }
