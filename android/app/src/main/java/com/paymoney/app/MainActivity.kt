@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var retryButton: Button
 
-    private val targetUrl = "https://paymoney18.netlify.app/"
+    private val targetUrl = "file:///android_asset/www/index.html"
 
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var pendingPermissionRequest: PermissionRequest? = null
@@ -95,8 +95,10 @@ class MainActivity : AppCompatActivity() {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
         settings.databaseEnabled = true
-        settings.allowFileAccess = false
-        settings.allowContentAccess = false
+        settings.allowFileAccess = true
+        settings.allowContentAccess = true
+        settings.allowFileAccessFromFileURLs = true
+        settings.allowUniversalAccessFromFileURLs = true
         
         // Enable responsive layout
         settings.useWideViewPort = true
@@ -134,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                 val url = request?.url.toString()
                 
                 // Allow our domain to load inside WebView
-                if (url.startsWith("https://paymoney18.netlify.app") || url.startsWith("http://paymoney18.netlify.app")) {
+                if (url.startsWith("file:///") || url.startsWith("https://paymoney18.netlify.app") || url.startsWith("http://paymoney18.netlify.app")) {
                     return false
                 }
                 

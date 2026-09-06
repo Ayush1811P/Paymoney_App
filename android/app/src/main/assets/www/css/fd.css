@@ -1,0 +1,300 @@
+/* FD Account specific styles */
+
+.fd-container {
+  padding-top: var(--spacing-lg);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-md);
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--spacing-xl);
+}
+
+.fd-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.plan-card {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.plan-label {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.plan-duration {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+.plan-rate {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--success-color);
+  margin: var(--spacing-sm) 0;
+}
+
+.plan-details-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-medium);
+  margin-bottom: var(--spacing-md);
+}
+
+.fd-modal {
+  max-width: 500px;
+}
+
+.plan-summary-bar {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--bg-grey);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.plan-summary-bar > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-summary-bar .label {
+  font-size: 12px;
+  color: var(--text-medium);
+  margin-bottom: 4px;
+}
+
+.plan-summary-bar .value {
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+.returns-calculator-box {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.calc-row, .review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-md);
+}
+
+.calc-divider, .review-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: var(--spacing-sm) 0;
+}
+
+.maturity-row {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.date-row {
+  font-size: var(--font-size-sm);
+  color: var(--text-medium);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.demo-warning {
+  background-color: var(--warning-light);
+  color: var(--warning-dark);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  border: 1px solid #ffcc80;
+}
+
+.active-fd-card {
+  background: linear-gradient(135deg, #002970, #004ba0);
+  color: white;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-md);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.active-fd-card:hover {
+  transform: translateY(-2px);
+}
+
+.active-fd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.active-fd-title {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.active-fd-plan {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.active-fd-amount-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.active-fd-amount-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.active-fd-amount-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.progress-container {
+  margin-top: var(--spacing-md);
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #00baf2;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 15px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 3px;
+  top: 15px;
+  bottom: 15px;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.timeline-progress {
+  width: 100%;
+  background-color: var(--primary-color);
+}
+
+.timeline-point {
+  position: relative;
+  margin-bottom: var(--spacing-lg);
+  padding-left: var(--spacing-md);
+}
+
+.timeline-point:last-child {
+  margin-bottom: 0;
+}
+
+.point-marker {
+  position: absolute;
+  left: -16px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--border-color);
+  z-index: 2;
+}
+
+.timeline-point.start .point-marker,
+.timeline-point.current .point-marker {
+  background-color: var(--primary-color);
+}
+
+.timeline-point.end.completed .point-marker {
+  background-color: var(--success-color);
+}
+
+.status-banner {
+  background-color: var(--success-light);
+  color: var(--success-dark);
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-banner.matured {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+@media (max-width: 768px) {
+  .fd-plans-grid {
+    grid-template-columns: 1fr;
+  }
+}
