@@ -33,7 +33,7 @@
   height: 30px;
   border-radius: 50%;
   background-color: var(--primary-color);
-  color: var(--text-white);
+  color: var(--secondary-color);
   border: none;
   display: flex;
   align-items: center;
@@ -84,7 +84,7 @@
 }
 
 .profile-tab.active {
-  color: var(--primary-color);
+  color: var(--primary-dark);
   border-bottom-color: var(--primary-color);
 }
 

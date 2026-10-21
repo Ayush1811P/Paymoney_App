@@ -27,5 +27,9 @@ dist-ssr
 # Local Netlify folder
 .netlify
 
-mingit/
-mingit.zip
+# Database Backups & sensitive dumps
+database backup/
+database\ backup/
+*.backup
+*.dump
+*.bak

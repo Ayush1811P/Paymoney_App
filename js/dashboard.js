@@ -6,8 +6,13 @@ let isBalanceVisible = false;
 let currentWalletBalance = 0;
 
 document.addEventListener('DOMContentLoaded', async function() {
-  // Require authentication
-  if (!(await requireAuth())) return;
+  // Require normal authentication (redirects lite users to lite-dashboard.html)
+  if (!(await requireAuth('normal'))) return;
+
+  const scanQrBtn = document.getElementById('scanQrBtn');
+  if (scanQrBtn) {
+    scanQrBtn.addEventListener('click', handleScanQr);
+  }
   
   // Load wallet data and transactions in parallel
   await Promise.all([
@@ -16,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   ]);
   
   // Initialize modals
-  initAddMoneyModal();
   initSendMoneyModal();
   
   // Initialize eye toggle for wallet balance
@@ -92,23 +96,11 @@ async function loadTransactions() {
     
     recentTransactions.forEach(transaction => {
       // If user is sender, it's a debit. If user is receiver, it's a credit.
-      let isCredit = false;
-      if (transaction.transaction_type === 'add_money') {
-        isCredit = true;
-      } else if (transaction.receiver_id === user.id) {
-        isCredit = true;
-      }
+      const isCredit = transaction.receiver_id === user.id;
       
       const typeClass = isCredit ? 'credit' : 'debit';
       
-      let otherPerson = null;
-      if (transaction.transaction_type === 'add_money') {
-        otherPerson = user;
-      } else if (isCredit) {
-        otherPerson = transaction.sender;
-      } else {
-        otherPerson = transaction.receiver;
-      }
+      const otherPerson = isCredit ? transaction.sender : transaction.receiver;
       
       const avatarUrl = getAvatarUrl(otherPerson);
       
@@ -129,141 +121,6 @@ async function loadTransactions() {
     });
     
     transactionsList.innerHTML = transactionsHTML;
-  }
-}
-
-// Get add money cooldown status
-function getAddMoneyCooldown() {
-  const userId = localStorage.getItem('paymoney_user_id');
-  const storageKey = userId ? `lastAddMoneyTime_${userId}` : 'lastAddMoneyTime';
-  const lastAddMoneyTime = localStorage.getItem(storageKey);
-  
-  if (!lastAddMoneyTime) {
-    return { isLocked: false };
-  }
-  
-  const lastTime = parseInt(lastAddMoneyTime, 10);
-  const now = Date.now();
-  const timePassed = now - lastTime;
-  const cooldownDuration = 60 * 60 * 1000; // 1 hour in ms
-  
-  if (timePassed < cooldownDuration) {
-    const timeLeft = cooldownDuration - timePassed;
-    const minutesLeft = Math.floor(timeLeft / (60 * 1000));
-    const secondsLeft = Math.floor((timeLeft % (60 * 1000)) / 1000);
-    
-    let remainingMessage = '';
-    if (minutesLeft > 0) {
-      remainingMessage = `${minutesLeft}m ${secondsLeft}s`;
-    } else {
-      remainingMessage = `${secondsLeft}s`;
-    }
-    
-    return {
-      isLocked: true,
-      remainingMessage: remainingMessage
-    };
-  }
-  
-  return { isLocked: false };
-}
-
-// Initialize Add Money modal
-function initAddMoneyModal() {
-  const addMoneyBtn = document.getElementById('addMoneyBtn');
-  const addMoneyModal = document.getElementById('addMoneyModal');
-  const addMoneyForm = document.getElementById('addMoneyForm');
-  
-  if (addMoneyBtn && addMoneyModal && addMoneyForm) {
-    addMoneyBtn.addEventListener('click', function() {
-      const cooldownInfo = getAddMoneyCooldown();
-      if (cooldownInfo.isLocked) {
-        showNotification(`You can only add money once per hour. Please try again in ${cooldownInfo.remainingMessage}.`, 'error');
-        return;
-      }
-      addMoneyModal.style.display = 'block';
-    });
-    
-    // Allow clicking the entire option box container to select the radio
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    paymentOptions.forEach(option => {
-      option.addEventListener('click', function(e) {
-        if (e.target.tagName === 'INPUT') return;
-        const radio = option.querySelector('input[type="radio"]');
-        if (radio) {
-          radio.checked = true;
-        }
-      });
-    });
-    
-    addMoneyForm.addEventListener('submit', handleAddMoney);
-  }
-}
-
-// Handle Add Money form submission
-async function handleAddMoney(e) {
-  e.preventDefault();
-  
-  const cooldownInfo = getAddMoneyCooldown();
-  if (cooldownInfo.isLocked) {
-    showNotification(`You can only add money once per hour. Please try again in ${cooldownInfo.remainingMessage}.`, 'error');
-    return;
-  }
-  
-  const addAmount = document.getElementById('addAmount').value;
-  const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-  
-  const amountNum = parseFloat(addAmount);
-  if (!addAmount || isNaN(amountNum) || amountNum <= 0) {
-    showNotification('Please enter a valid amount', 'error');
-    return;
-  }
-  
-  if (addAmount.includes('.') && addAmount.split('.')[1].length > 2) {
-    showNotification('Amount can have at most 2 decimal places', 'error');
-    return;
-  }
-  
-  // Get current wallet balance
-  const currentBalance = await getWalletBalance();
-  const newBalance = currentBalance + parseFloat(addAmount);
-  
-  // Update wallet balance
-  await updateWalletBalance(newBalance);
-  
-  // Add transaction
-  await addTransaction(
-    parseFloat(addAmount), 
-    'add_money', 
-    `Added money via ${getPaymentMethodName(paymentMethod)}`
-  );
-  
-  // Set cooldown
-  const userId = localStorage.getItem('paymoney_user_id');
-  const storageKey = userId ? `lastAddMoneyTime_${userId}` : 'lastAddMoneyTime';
-  localStorage.setItem(storageKey, Date.now().toString());
-  
-  // Close modal
-  const addMoneyModal = document.getElementById('addMoneyModal');
-  addMoneyModal.style.display = 'none';
-  
-  // Reset form
-  const addMoneyForm = document.getElementById('addMoneyForm');
-  if (addMoneyForm) addMoneyForm.reset();
-  
-  showNotification(`Added ₹${formatCurrency(addAmount)} successfully`);
-  
-  // Reload UI
-  await loadWalletData();
-  await loadTransactions();
-}
-
-function getPaymentMethodName(method) {
-  switch (method) {
-    case 'upi': return 'UPI';
-    case 'card': return 'Card';
-    case 'netbanking': return 'Net Banking';
-    default: return method;
   }
 }
 
@@ -315,7 +172,7 @@ async function handleSendMoney(e) {
   // Lookup receiver by phone or UPI ID
   let query = supabaseClient.from('profiles').select('id, wallet_balance, upi_id, phone');
   if (recipientMobile.includes('@')) {
-    if (recipientMobile.endsWith('@paymoney')) {
+    if (recipientMobile.endsWith('@paymoney') || recipientMobile.endsWith('@paymoneylite')) {
       const phoneNum = recipientMobile.split('@')[0];
       query = query.or(`upi_id.eq.${recipientMobile},phone.eq.${phoneNum}`);
     } else {

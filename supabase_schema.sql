@@ -8,8 +8,13 @@ CREATE TABLE profiles (
     upi_pin TEXT,
     password_hash TEXT NOT NULL,
     wallet_balance NUMERIC(10, 2) DEFAULT 20000.00,
+    account_type TEXT DEFAULT 'normal' CHECK (account_type IN ('normal', 'lite')),
+    parent_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    age INT CHECK (age IS NULL OR (age > 0 AND age < 120)),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
+
+CREATE INDEX IF NOT EXISTS idx_profiles_parent_id ON profiles(parent_id);
 
 -- 2. Create 'bank_accounts' table (for the accounts linked via UPI)
 CREATE TABLE bank_accounts (
@@ -155,3 +160,23 @@ BEGIN
     RETURN json_build_object('valid', true);
 END;
 $$;
+
+-- ==========================================================
+-- 6. PayMoney Lite Account Migration (Phase 1 & 2)
+-- ==========================================================
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS account_type VARCHAR(20) DEFAULT 'normal' 
+CHECK (account_type IN ('normal', 'lite'));
+
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
+
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS age INT CHECK (age IS NULL OR (age >= 5 AND age <= 25));
+
+CREATE INDEX IF NOT EXISTS idx_profiles_parent_id ON profiles(parent_id);
+
+UPDATE profiles 
+SET account_type = 'normal' 
+WHERE account_type IS NULL;
+

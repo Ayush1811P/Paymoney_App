@@ -4,24 +4,27 @@ PayMoney is a comprehensive web and native Kotlin Android application for seamle
 
 ## Features
 
+- **PayMoney Rebirth Landing Page**: High-performance, responsive luxury fintech landing experience.
+- **Normal & Lite Accounts**: Independent adult accounts alongside supervised Lite child accounts.
+- **Family Dashboard**: Parent monitoring system with real-time child transaction feeds and spending overview.
 - **Dashboard**: Track your balance, recent transactions, and quick links.
-- **Mobile & DTH Recharge**: Quick and easy prepaid/postpaid recharges.
+- **UPI Payments & Dynamic QR**: Scan and pay with camera QR reader, generate dynamic payment QR codes, or send money directly to UPI IDs.
+- **Mobile & DTH Recharge**: Quick and easy prepaid/postpaid recharges with downloadable receipts.
 - **Utility Bills**: Pay your electricity and broadband bills instantly.
-- **UPI Payments**: Scan and pay or send money directly to UPI IDs.
 - **Fixed Deposits**: Secure your money with attractive interest rates.
-- **Android App**: A native Kotlin WebView application wrapper with optimized performance.
+- **Android Native App**: High-performance Kotlin WebView application wrapper with camera permissions, file upload support, and offline resilience.
 
 ## Getting Started
 
-1. Open `index.html` in your browser for the web version.
-2. For Android, you can build the APK via the provided GitHub Actions workflow `.github/workflows/android-build.yml` or using Gradle.
+1. Open [index.html](file:///c:/Users/ayush/Desktop/Paymoney%20App/index.html) in your browser for the web version.
+2. For Android, you can install the pre-built [PayMoney_fixed.apk](file:///c:/Users/ayush/Desktop/Paymoney%20App/PayMoney_fixed.apk) directly or rebuild using `./gradlew assembleDebug` in the `android/` directory.
 
 ## Architecture
 
-- **Frontend**: Vanilla HTML, CSS, JavaScript
-- **Backend/Database**: Supabase
-- **Android**: Native Kotlin, WebView
+- **Frontend**: Vanilla HTML5, CSS3, ES6+ JavaScript
+- **Backend/Database**: Supabase PostgreSQL + Netlify Serverless Functions
+- **Android**: Native Kotlin, AndroidX, Modern WebView with hardware acceleration
 
 ## Automated Build
 
-The Android APK is automatically built on every push to the `main` or `master` branch using GitHub Actions. Check the Actions tab in this repository to download the latest debug APK.
+The Android APK is automatically built on every push to the `main` or `master` branch using GitHub Actions (`.github/workflows/android-build.yml`). Check the Actions tab in this repository to download the latest debug APK.

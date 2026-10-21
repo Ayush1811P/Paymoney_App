@@ -77,26 +77,42 @@ async function getUser(forceRefresh = false) {
 }
 
 // Check if user is logged in
+// Check if user is logged in
 async function isLoggedIn() {
   const user = await getUser();
   return !!user;
 }
 
-// Redirect if not logged in
-async function requireAuth() {
-  const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
+// Redirect if not logged in, with optional account type routing
+async function requireAuth(expectedType = null) {
+  const user = await getUser();
+  if (!user) {
     window.location.href = 'login.html';
     return false;
   }
+  
+  if (expectedType === 'lite' && user.account_type === 'normal') {
+    window.location.href = 'dashboard.html';
+    return false;
+  }
+  
+  if (expectedType === 'normal' && user.account_type === 'lite') {
+    window.location.href = 'lite-dashboard.html';
+    return false;
+  }
+  
   return true;
 }
 
-// Redirect if already logged in
+// Redirect if already logged in based on account type
 async function redirectIfLoggedIn() {
-  const loggedIn = await isLoggedIn();
-  if (loggedIn) {
-    window.location.href = 'dashboard.html';
+  const user = await getUser();
+  if (user) {
+    if (user.account_type === 'lite') {
+      window.location.href = 'lite-dashboard.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
     return true;
   }
   return false;
@@ -251,6 +267,11 @@ function initLogout() {
 async function handleLogout(e) {
   e.preventDefault();
   localStorage.removeItem('paymoney_user_id');
+  localStorage.removeItem('paymoney_account_type');
+  cachedProfile = null;
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (_) {}
   showNotification('Logged out successfully');
   setTimeout(() => {
     window.location.href = 'login.html';
@@ -260,13 +281,9 @@ async function handleLogout(e) {
 // Update user info in header
 function getAvatarUrl(profile) {
   if (profile) {
-    try {
-      const localAvatar = localStorage.getItem(`profile_avatar_${profile.id}`);
-      if (localAvatar) return localAvatar;
-    } catch(e) {}
-  }
-  if (profile && profile.avatar_url) {
-    return profile.avatar_url;
+    const localAvatar = localStorage.getItem(`avatar_${profile.id}`);
+    if (localAvatar) return localAvatar;
+    if (profile.avatar_url) return profile.avatar_url;
   }
   const seed = profile ? (profile.full_name || profile.phone || 'user') : 'user';
   return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
@@ -424,17 +441,26 @@ async function handleScanQr(e) {
   const scannerUploadControls = document.getElementById('scannerUploadControls');
   const uploadedPreview = document.getElementById('uploadedQrPreview');
   const scannerOverlay = document.getElementById('scannerOverlay');
+  const cameraStatus = document.getElementById('scannerCameraStatus');
+  const externalUpiPayment = document.getElementById('externalUpiPayment');
+  const retryCameraBtn = document.getElementById('retryCameraBtn');
   const fileInput = document.getElementById('qrFileInput');
   
   if (scannerInterface) scannerInterface.style.display = 'block';
   if (scanQrResultCard) scanQrResultCard.style.display = 'none';
   if (loadingBarContainer) loadingBarContainer.style.display = 'none';
+  if (externalUpiPayment) externalUpiPayment.style.display = 'none';
+  scannedReceiver = null;
+  window.scannedReceiver = null;
+  scannedQrPaymentDetails = null;
   if (scannerUploadControls) scannerUploadControls.style.display = 'block';
   if (uploadedPreview) {
     uploadedPreview.style.display = 'none';
     uploadedPreview.src = '';
   }
   if (scannerOverlay) scannerOverlay.style.display = 'flex';
+  if (cameraStatus) cameraStatus.textContent = 'Starting camera…';
+  if (retryCameraBtn) retryCameraBtn.style.display = 'none';
   if (fileInput) fileInput.value = '';
   
   scanQrModal.style.display = 'block';
@@ -450,6 +476,7 @@ async function handleScanQr(e) {
     await startCameraScanner();
   } catch (error) {
     console.error('Error starting scanner:', error);
+    showNotification('Could not load the QR scanner. Check your connection and try again.', 'error');
   }
 }
 
@@ -593,40 +620,30 @@ function resetScannerView() {
   startCameraScanner();
 }
 
-async function requestCameraAccess() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    try {
-      // Force prompt for camera permission
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      // Stop the stream immediately to free the resource
-      stream.getTracks().forEach(track => track.stop());
-      return true;
-    } catch (err) {
-      console.error("Camera access permission denied:", err);
-      return false;
-    }
-  }
-  return false;
-}
-
 async function startCameraScanner() {
+  if (cameraStartInProgress) return;
+  cameraStartInProgress = true;
+  const cameraStatus = document.getElementById('scannerCameraStatus');
+  const retryCameraBtn = document.getElementById('retryCameraBtn');
+  if (retryCameraBtn) {
+    retryCameraBtn.disabled = true;
+    retryCameraBtn.style.display = 'none';
+  }
+
   try {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      // file:// context blocker notice
-      showNotification("Browser blocks camera access on local files (file://). Please upload your QR image instead.", "warning");
-      return;
-    }
-    
-    showNotification("Requesting camera access...");
-    const hasPermission = await requestCameraAccess();
-    if (!hasPermission) {
-      showNotification("Camera access denied. Please grant permission in browser settings or upload the QR image.", "error");
+      const message = window.isSecureContext
+        ? "Camera access is unavailable in this browser. Please upload your QR image instead."
+        : "Camera scanning requires HTTPS or localhost. Please upload your QR image instead.";
+      if (cameraStatus) cameraStatus.textContent = message;
+      showNotification(message, "warning");
       return;
     }
     
     if (!html5Qrcode) {
       html5Qrcode = new Html5Qrcode("qrReader");
     }
+    if (html5Qrcode.isScanning) return;
     
     const config = { fps: 10, qrbox: { width: 220, height: 220 } };
     
@@ -640,9 +657,34 @@ async function startCameraScanner() {
         // Silent
       }
     );
+    if (cameraStatus) cameraStatus.textContent = 'Camera is ready. Align a UPI QR code within the frame.';
+    showNotification('Camera ready. Scan a UPI QR code.');
   } catch (err) {
     console.error("Camera access failed", err);
-    showNotification("Failed to start camera. Please upload the QR code image below.", "error");
+    if (html5Qrcode && !html5Qrcode.isScanning) {
+      try {
+        await html5Qrcode.clear();
+        html5Qrcode = null;
+      } catch (clearError) {
+        console.error('Could not reset the QR scanner after camera startup failed:', clearError);
+      }
+    }
+    const permissionDenied = err && err.name === 'NotAllowedError';
+    if (cameraStatus) {
+      cameraStatus.textContent = permissionDenied
+        ? 'Camera access was not allowed. Try again, or enable camera access in this site’s browser settings.'
+        : 'Camera could not start. Try again or upload a QR image.';
+    }
+    const message = permissionDenied
+      ? 'Camera access was not allowed. You can try again here; if the browser has blocked it, enable camera access in site settings.'
+      : err && err.name === 'NotFoundError'
+        ? 'No camera was found. Connect a camera or upload a QR image.'
+        : `Camera could not start${err && err.message ? `: ${err.message}` : '.'}`;
+    if (retryCameraBtn) retryCameraBtn.style.display = 'inline-flex';
+    showNotification(message, 'error');
+  } finally {
+    cameraStartInProgress = false;
+    if (retryCameraBtn) retryCameraBtn.disabled = false;
   }
 }
 
@@ -659,75 +701,228 @@ async function stopCameraScanner() {
   }
 }
 
+let html5Qrcode = null;
+let cameraStartInProgress = false;
 let scannedReceiver = null;
+let scannedQrPaymentDetails = null;
+
+function parseUpiQr(decodedText) {
+  const text = decodedText.trim();
+  let parameters = new URLSearchParams();
+
+  if (/^upi:\/\/pay\?/i.test(text)) {
+    parameters = new URLSearchParams(text.slice(text.indexOf('?') + 1));
+  } else if (/^[^@\s?&]+@[^@\s?&]+$/.test(text)) {
+    parameters.set('pa', text);
+    parameters.set('cu', 'INR');
+  } else {
+    return null;
+  }
+
+  const values = Object.create(null);
+  const normalizedParameters = new URLSearchParams();
+  let hasDuplicatePaymentField = false;
+  parameters.forEach((value, key) => {
+    const normalizedKey = key.toLowerCase();
+    if (['pa', 'pn', 'am', 'cu', 'tn'].includes(normalizedKey) &&
+        Object.prototype.hasOwnProperty.call(values, normalizedKey)) {
+      hasDuplicatePaymentField = true;
+      return;
+    }
+    values[normalizedKey] = value;
+    normalizedParameters.append(normalizedKey, value);
+  });
+  if (hasDuplicatePaymentField) return null;
+
+  const upiId = (values.pa || '').trim();
+  if (!/^[^@\s?&]+@[^@\s?&]+$/.test(upiId)) return null;
+
+  const amount = values.am || '';
+  if (amount && !/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(amount)) return null;
+  if (amount && Number(amount) <= 0) return null;
+
+  return {
+    upiId,
+    payeeName: values.pn || '',
+    amount,
+    note: values.tn || '',
+    currency: (values.cu || 'INR').toUpperCase(),
+    parameters: normalizedParameters
+  };
+}
+
+function buildExternalUpiPaymentUri(qrDetails, amount, note) {
+  const paymentParameters = new URLSearchParams(qrDetails.parameters);
+  paymentParameters.set('pa', qrDetails.upiId);
+  paymentParameters.set('am', amount);
+  paymentParameters.set('cu', 'INR');
+
+  if (note) {
+    paymentParameters.set('tn', note);
+  } else {
+    paymentParameters.delete('tn');
+  }
+
+  const query = paymentParameters.toString();
+  if (/android/i.test(navigator.userAgent)) {
+    return `intent://pay?${query}#Intent;scheme=upi;end`;
+  }
+  return `upi://pay?${query}`;
+}
+
+async function resumeQrScannerAfterError(message) {
+  const scannerInterface = document.getElementById('scannerInterface');
+  const resultCard = document.getElementById('scanQrResultCard');
+  const externalPayment = document.getElementById('externalUpiPayment');
+  const proceedButton = document.getElementById('proceedToPayBtn');
+
+  scannedReceiver = null;
+  window.scannedReceiver = null;
+  scannedQrPaymentDetails = null;
+  if (scannerInterface) scannerInterface.style.display = 'block';
+  if (resultCard) resultCard.style.display = 'none';
+  if (externalPayment) externalPayment.style.display = 'none';
+  if (proceedButton) {
+    proceedButton.disabled = true;
+    proceedButton.style.display = 'block';
+  }
+
+  showNotification(message, 'error');
+  await startCameraScanner();
+}
 
 async function onQrScanSuccess(decodedText) {
-  // Stop scanner
   await stopCameraScanner();
-  
-  // Parse QR contents (Case-insensitive check)
-  let upiId = '';
-  const cleanText = decodedText.trim();
-  
-  // Try matching pa=... parameter in a case-insensitive way
-  const paMatch = cleanText.match(/pa=([^&]+)/i);
-  if (paMatch) {
-    upiId = paMatch[1];
-  } else if (cleanText.includes('@')) {
-    // Treat the whole text as raw UPI ID fallback if it contains @
-    upiId = cleanText;
-  } else {
-    upiId = cleanText;
-  }
-  
-  if (!upiId) {
-    showNotification('Invalid QR code format', 'error');
+
+  const qrDetails = parseUpiQr(decodedText);
+  if (!qrDetails) {
+    await resumeQrScannerAfterError('This QR code is not a valid UPI payment QR.');
     return;
   }
-  upiId = decodeURIComponent(upiId).trim();
-  
-  // Lookup recipient details
-  showNotification('Fetching recipient details...');
-  let query = supabaseClient.from('profiles').select('id, full_name, upi_id, phone, wallet_balance');
-  if (upiId.includes('@')) {
-    if (upiId.endsWith('@paymoney')) {
-      const phoneNum = upiId.split('@')[0];
-      query = query.or(`upi_id.eq.${upiId},phone.eq.${phoneNum}`);
-    } else {
-      query = query.eq('upi_id', upiId);
+
+  const normalizedUpiId = qrDetails.upiId.toLowerCase();
+  const isPayMoneyRecipient = normalizedUpiId.endsWith('@paymoney') ||
+    normalizedUpiId.endsWith('@paymoneylite');
+  const resultCard = document.getElementById('scanQrResultCard');
+  const scannerInterface = document.getElementById('scannerInterface');
+  const receiverName = document.getElementById('resolvedReceiverName');
+  const receiverUpi = document.getElementById('resolvedReceiverUpi');
+  const receiverAvatar = document.getElementById('resolvedReceiverAvatar');
+  const resultMessage = document.getElementById('scanQrResultMessage');
+  const resultAmount = document.getElementById('scanQrAmount');
+  const proceedButton = document.getElementById('proceedToPayBtn');
+
+  if (!resultCard || !scannerInterface || !receiverName || !receiverUpi ||
+      !receiverAvatar || !resultMessage || !resultAmount || !proceedButton) {
+    showNotification('The QR scanner could not display the scan result.', 'error');
+    return;
+  }
+
+  scannedReceiver = null;
+  window.scannedReceiver = null;
+  scannedQrPaymentDetails = qrDetails;
+  proceedButton.disabled = true;
+  proceedButton.textContent = 'Continue to PayMoney payment';
+  resultAmount.textContent = qrDetails.amount ? `QR amount: ₹${qrDetails.amount}` : '';
+  resultAmount.style.display = qrDetails.amount ? 'block' : 'none';
+
+  if (!isPayMoneyRecipient) {
+    if (qrDetails.currency !== 'INR') {
+      await resumeQrScannerAfterError('Only INR UPI QR codes are supported.');
+      return;
     }
-  } else {
-    query = query.eq('phone', upiId);
-  }
-  
-  const { data: receiverData, error: receiverError } = await query.maybeSingle();
-  
-  if (receiverError || !receiverData) {
-    showNotification('PayMoney user/account not found for this QR', 'error');
+
+    receiverName.textContent = qrDetails.payeeName || 'UPI recipient';
+    receiverUpi.textContent = qrDetails.upiId;
+    receiverAvatar.textContent = (qrDetails.payeeName || 'U').charAt(0).toUpperCase();
+    resultMessage.textContent = 'Recipient details come from the QR and are not verified by PayMoney. Review them carefully; payment will continue in your UPI app.';
+    const externalPayment = document.getElementById('externalUpiPayment');
+    const externalAmount = document.getElementById('externalUpiAmount');
+    const externalNote = document.getElementById('externalUpiNote');
+    if (!externalPayment || !externalAmount || !externalNote) {
+      await resumeQrScannerAfterError('External UPI payment form is unavailable.');
+      return;
+    }
+    externalAmount.value = qrDetails.amount;
+    externalNote.value = qrDetails.note;
+    externalPayment.style.display = 'block';
+    proceedButton.style.display = 'none';
+    scannerInterface.style.display = 'none';
+    resultCard.style.display = 'block';
     return;
   }
-  
+
+  const externalPayment = document.getElementById('externalUpiPayment');
+  if (externalPayment) externalPayment.style.display = 'none';
+  proceedButton.style.display = 'block';
+
+  if (qrDetails.currency !== 'INR') {
+    await resumeQrScannerAfterError('PayMoney can only process UPI QR requests in INR.');
+    return;
+  }
+
+  showNotification('Verifying PayMoney recipient...');
+  let receiverData;
+  try {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('id, full_name, upi_id, phone')
+      .eq('upi_id', qrDetails.upiId)
+      .maybeSingle();
+    if (error) throw error;
+    receiverData = data;
+  } catch (error) {
+    console.error('PayMoney QR recipient lookup failed:', error);
+    await resumeQrScannerAfterError('Could not verify this PayMoney QR. Please try again.');
+    return;
+  }
+
+  let verifiedReceiver = receiverData;
+  if (!verifiedReceiver && /^\d{10}$/.test(qrDetails.upiId.split('@')[0])) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('id, full_name, upi_id, phone')
+        .eq('phone', qrDetails.upiId.split('@')[0])
+        .maybeSingle();
+      if (error) throw error;
+      verifiedReceiver = data;
+    } catch (error) {
+      console.error('PayMoney QR phone lookup failed:', error);
+      await resumeQrScannerAfterError('Could not verify this PayMoney QR. Please try again.');
+      return;
+    }
+  }
+
+  if (!verifiedReceiver) {
+    await resumeQrScannerAfterError('No matching PayMoney account was found. Payment is unavailable.');
+    return;
+  }
+
   const user = await getUser();
-  if (receiverData.id === user.id) {
-    showNotification('Cannot send money to yourself', 'error');
+  if (!user) {
+    await resumeQrScannerAfterError('Please log in to scan and pay.');
     return;
   }
-  
-  // Save recipient details
-  window.scannedReceiver = receiverData;
-  
-  // Populate confirmation card
-  const upiAddress = receiverData.upi_id || `${receiverData.phone}@paymoney`;
-  document.getElementById('resolvedReceiverName').textContent = receiverData.full_name;
-  document.getElementById('resolvedReceiverUpi').textContent = upiAddress;
-  document.getElementById('resolvedReceiverAvatar').textContent = (receiverData.full_name || 'U').charAt(0).toUpperCase();
-  
-  // Update button text to "Pay to [User Name]"
-  document.getElementById('proceedToPayBtn').textContent = `Pay to ${receiverData.full_name}`;
-  
-  // Switch modal view
-  document.getElementById('scannerInterface').style.display = 'none';
-  document.getElementById('scanQrResultCard').style.display = 'block';
+  if (verifiedReceiver.id === user.id) {
+    await resumeQrScannerAfterError('Cannot send money to yourself.');
+    return;
+  }
+
+  scannedReceiver = verifiedReceiver;
+  window.scannedReceiver = verifiedReceiver;
+  scannedQrPaymentDetails = qrDetails;
+
+  const upiAddress = verifiedReceiver.upi_id || `${verifiedReceiver.phone}@paymoney`;
+  const fullName = verifiedReceiver.full_name || 'PayMoney user';
+  receiverName.textContent = fullName;
+  receiverUpi.textContent = upiAddress;
+  receiverAvatar.textContent = fullName.charAt(0).toUpperCase();
+  resultMessage.textContent = 'PayMoney account verified. Review the recipient before continuing.';
+  proceedButton.textContent = `Continue to pay ${fullName}`;
+  proceedButton.disabled = false;
+  scannerInterface.style.display = 'none';
+  resultCard.style.display = 'block';
 }
 
 // Inject Scan QR Modals HTML dynamically
@@ -807,7 +1002,7 @@ function injectScanQrModals() {
         <!-- Scanner interface -->
         <div id="scannerInterface">
           <h2 style="color: var(--secondary-color); margin-bottom: var(--spacing-sm); font-size: 1.5rem; font-weight: 700;">Scan QR Code</h2>
-          <p style="color: var(--text-medium); margin-bottom: var(--spacing-md); font-size: 0.9rem;">Scan a PayMoney QR to send money instantly</p>
+          <p style="color: var(--text-medium); margin-bottom: var(--spacing-md); font-size: 0.9rem;">Scan a UPI QR code to continue with a payment.</p>
           
           <!-- Styled Viewfinder -->
           <div class="scanner-viewfinder">
@@ -822,6 +1017,8 @@ function injectScanQrModals() {
               <p style="color: white; font-size: 0.85rem; margin-top: var(--spacing-md); font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">Align QR code within the frame</p>
             </div>
           </div>
+          <p id="scannerCameraStatus" role="status" style="min-height: 1.5em; margin: 0; color: var(--text-medium); font-size: 0.85rem;">Starting camera…</p>
+          <button type="button" id="retryCameraBtn" class="btn btn-outline" style="display: none; margin: var(--spacing-sm) auto 0;">Try camera again</button>
           
           <div style="margin: var(--spacing-md) 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-light); font-size: 0.9rem;">
             <span style="height: 1px; background: var(--border-color); flex: 1;"></span>
@@ -853,18 +1050,38 @@ function injectScanQrModals() {
         
         <!-- Result card -->
         <div id="scanQrResultCard" style="display: none; padding: var(--spacing-md);">
-          <h2 style="color: var(--secondary-color); margin-bottom: var(--spacing-md); font-size: 1.5rem; font-weight: 700;">Pay Recipient</h2>
+          <h2 style="color: var(--secondary-color); margin-bottom: var(--spacing-md); font-size: 1.5rem; font-weight: 700;">QR Details</h2>
           <div style="background: var(--bg-grey); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-lg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;">
             <div style="width: 60px; height: 60px; background-color: var(--secondary-light); color: var(--secondary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; margin-bottom: var(--spacing-sm);" id="resolvedReceiverAvatar">R</div>
             <h3 id="resolvedReceiverName" style="margin: 0; font-size: 1.15rem; font-weight: 600; color: var(--text-dark);">Receiver Name</h3>
             <p id="resolvedReceiverUpi" style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-medium); font-family: monospace; letter-spacing: 0.5px;">receiver@paymoney</p>
+            <p id="scanQrAmount" style="display: none; margin: 8px 0 0; font-weight: 600; color: var(--text-dark);"></p>
           </div>
-          <button id="proceedToPayBtn" class="btn btn-primary" style="width: 100%;">Pay to User</button>
+          <p id="scanQrResultMessage" role="status" style="font-size: 0.9rem; color: var(--text-medium); margin-bottom: var(--spacing-md);"></p>
+          <div id="externalUpiPayment" style="display: none; text-align: left;">
+            <div class="form-group">
+              <label for="externalUpiAmount">Amount (₹)</label>
+              <input type="number" id="externalUpiAmount" min="0.01" step="0.01" inputmode="decimal" required placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+              <label for="externalUpiNote">Note (Optional)</label>
+              <input type="text" id="externalUpiNote" maxlength="80" placeholder="Add a note">
+            </div>
+            <button type="button" id="externalUpiPayBtn" class="btn btn-primary" style="width: 100%;">Continue in UPI app</button>
+            <p style="margin: var(--spacing-sm) 0 0; font-size: 0.8rem; color: var(--text-light);">PayMoney will open a UPI app on your device. Review the recipient and confirm payment in that app.</p>
+            <p id="externalUpiHandoffMessage" role="status" style="margin: var(--spacing-sm) 0 0; font-size: 0.85rem; color: var(--text-medium);"></p>
+          </div>
+          <button id="proceedToPayBtn" class="btn btn-primary" style="width: 100%;" disabled>Continue to PayMoney payment</button>
         </div>
       </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', scanModalHtml);
+
+  const retryCameraBtn = document.getElementById('retryCameraBtn');
+  if (retryCameraBtn) {
+    retryCameraBtn.addEventListener('click', startCameraScanner);
+  }
   
   // Wire up close button specifically for Scan Modal
   const closeScanBtn = document.getElementById('closeScanQrModal');
@@ -888,13 +1105,23 @@ function injectScanQrModals() {
   const proceedToPayBtn = document.getElementById('proceedToPayBtn');
   if (proceedToPayBtn) {
     proceedToPayBtn.addEventListener('click', () => {
-      const receiver = window.scannedReceiver;
-      if (!receiver) return;
+      const receiver = scannedReceiver;
+      if (!receiver || proceedToPayBtn.disabled) return;
       
       document.getElementById('scanQrModal').style.display = 'none';
       
       const upiAddress = receiver.upi_id || `${receiver.phone}@paymoney`;
       const fullName = receiver.full_name || 'User';
+      const paymentParams = new URLSearchParams({
+        pa: upiAddress,
+        pn: fullName
+      });
+      if (scannedQrPaymentDetails && scannedQrPaymentDetails.amount) {
+        paymentParams.set('am', scannedQrPaymentDetails.amount);
+      }
+      if (scannedQrPaymentDetails && scannedQrPaymentDetails.note) {
+        paymentParams.set('tn', scannedQrPaymentDetails.note);
+      }
       
       if (window.location.pathname.endsWith('upi.html')) {
         const sendUpiBtn = document.getElementById('sendUpiBtn');
@@ -905,11 +1132,57 @@ function injectScanQrModals() {
           recipientUpiIdInput.value = upiAddress;
           recipientUpiIdInput.readOnly = true;
         }
+        const amountInput = document.getElementById('upiSendAmount');
+        if (amountInput && scannedQrPaymentDetails && scannedQrPaymentDetails.amount) {
+          amountInput.value = scannedQrPaymentDetails.amount;
+        }
+        const noteInput = document.getElementById('upiSendNote');
+        if (noteInput && scannedQrPaymentDetails && scannedQrPaymentDetails.note) {
+          noteInput.value = scannedQrPaymentDetails.note;
+        }
       } else {
         const currentPath = window.location.href.split('?')[0];
         const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-        window.location.href = basePath + `upi.html?pa=${encodeURIComponent(upiAddress)}&pn=${encodeURIComponent(fullName)}`;
+        window.location.href = basePath + `upi.html?${paymentParams.toString()}`;
       }
+    });
+  }
+
+  const externalUpiPayBtn = document.getElementById('externalUpiPayBtn');
+  if (externalUpiPayBtn) {
+    externalUpiPayBtn.addEventListener('click', () => {
+      if (!scannedQrPaymentDetails || externalUpiPayBtn.disabled) return;
+
+      const amountInput = document.getElementById('externalUpiAmount');
+      const noteInput = document.getElementById('externalUpiNote');
+      const amount = amountInput ? amountInput.value.trim() : '';
+      const note = noteInput ? noteInput.value.trim() : '';
+      if (!/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(amount) || Number(amount) <= 0) {
+        showNotification('Enter a valid amount with up to 2 decimal places.', 'error');
+        return;
+      }
+
+      const paymentUri = buildExternalUpiPaymentUri(scannedQrPaymentDetails, amount, note);
+      const handoffMessage = document.getElementById('externalUpiHandoffMessage');
+      if (!/android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        if (handoffMessage) {
+          handoffMessage.textContent = 'UPI apps open from a supported mobile device. Open this page on your phone with a UPI app installed to continue.';
+        }
+        showNotification('Open PayMoney on a mobile device with a UPI app installed to continue.', 'warning');
+        return;
+      }
+
+      if (handoffMessage) {
+        handoffMessage.textContent = 'Opening your UPI app… Review the recipient and confirm payment there.';
+      }
+      window.location.href = paymentUri;
+
+      window.setTimeout(() => {
+        if (document.visibilityState === 'visible' && handoffMessage) {
+          handoffMessage.textContent = 'No UPI app opened. Install or enable a UPI app, then try again.';
+          showNotification('No UPI app opened. Check that a UPI app is installed and enabled.', 'warning');
+        }
+      }, 1500);
     });
   }
 }
@@ -1113,21 +1386,6 @@ function injectUpiModals() {
           </div>
         </div>
       </div>
-
-      <!-- Wrong PIN Modal -->
-      <div id="wrongPinModal" class="upi-global-modal" style="display: none; text-align: center;">
-        <div class="upi-global-header" style="justify-content: center; position: relative;">
-          <h3 style="color: var(--error-color); margin: 0;">Wrong PIN</h3>
-          <button class="upi-global-close" onclick="closeUpiModals()" style="position: absolute; right: 0; top: -5px;">&times;</button>
-        </div>
-        <div class="upi-global-body">
-          <div style="font-size: 3rem; color: var(--error-color); margin: 20px 0;">
-            <svg viewBox="0 0 24 24" style="width: 64px; height: 64px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          </div>
-          <p style="margin-bottom: 20px; color: var(--text-medium);">The UPI PIN you entered is incorrect. Please try again.</p>
-          <button class="btn btn-primary" onclick="retryUpiPin()" style="width: 100%;">Try Again</button>
-        </div>
-      </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', html);
@@ -1140,15 +1398,7 @@ function closeUpiModals() {
     document.getElementById('addBankModal').style.display = 'none';
     document.getElementById('setUpiModal').style.display = 'none';
     document.getElementById('enterUpiModal').style.display = 'none';
-    const wrongPinModal = document.getElementById('wrongPinModal');
-    if (wrongPinModal) wrongPinModal.style.display = 'none';
   }
-}
-
-function retryUpiPin() {
-  document.getElementById('wrongPinModal').style.display = 'none';
-  document.getElementById('enterUpiModal').style.display = 'block';
-  clearUpiPin();
 }
 
 async function requireUpiVerification(amount, onSuccess) {
@@ -1294,13 +1544,7 @@ async function submitUpiPin() {
     const hashedInputPin = await hashPassword(pinValue);
 
     if (user.upi_pin !== hashedInputPin) {
-      document.getElementById('enterUpiModal').style.display = 'none';
-      const wrongPinModal = document.getElementById('wrongPinModal');
-      if (wrongPinModal) {
-        wrongPinModal.style.display = 'block';
-      } else {
-        showNotification('Incorrect UPI PIN', 'error');
-      }
+      showNotification('Incorrect UPI PIN', 'error');
       clearUpiPin();
       return;
     }

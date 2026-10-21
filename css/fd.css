@@ -147,11 +147,11 @@
   font-size: 13px;
   margin-top: var(--spacing-lg);
   text-align: center;
-  border: 1px solid #ffcc80;
+  border: 1px solid var(--border-dark);
 }
 
 .active-fd-card {
-  background: linear-gradient(135deg, #002970, #004ba0);
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark) 55%, #8a6420);
   color: white;
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
@@ -214,7 +214,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background-color: #00baf2;
+  background: linear-gradient(90deg, #b8832e, #f3d9a0, #d4a24c);
   border-radius: 4px;
   transition: width 0.3s ease;
 }

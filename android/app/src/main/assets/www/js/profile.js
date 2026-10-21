@@ -2,6 +2,8 @@
  * Profile functionality for the PayMoney application (Supabase Integrated)
  */
 
+let pendingPasswordChange = null;
+
 document.addEventListener('DOMContentLoaded', async function() {
   if (!(await requireAuth())) return;
   
@@ -17,6 +19,16 @@ document.addEventListener('DOMContentLoaded', async function() {
   const changePasswordForm = document.getElementById('changePasswordForm');
   if (changePasswordForm) {
     changePasswordForm.addEventListener('submit', handlePasswordChange);
+  }
+
+  const passwordOtpForm = document.getElementById('passwordOtpForm');
+  if (passwordOtpForm) {
+    passwordOtpForm.addEventListener('submit', handlePasswordOtpVerification);
+  }
+
+  const cancelPasswordOtpBtn = document.getElementById('cancelPasswordOtpBtn');
+  if (cancelPasswordOtpBtn) {
+    cancelPasswordOtpBtn.addEventListener('click', resetPasswordChange);
   }
   
   initToggleSwitches();
@@ -62,27 +74,6 @@ async function loadProfileData() {
   if (profileEmailInput) profileEmailInput.value = profile.email || '';
   if (profilePhone) profilePhone.value = profile.phone;
   
-  // Load extra details from localStorage to prevent them from being empty
-  try {
-    const savedExtra = localStorage.getItem(`profile_extra_${user.id}`);
-    if (savedExtra) {
-      const extraDetails = JSON.parse(savedExtra);
-      const profileDob = document.getElementById('profileDob');
-      const profileAddress = document.getElementById('profileAddress');
-      const profileCity = document.getElementById('profileCity');
-      const profileState = document.getElementById('profileState');
-      const profilePincode = document.getElementById('profilePincode');
-      
-      if (profileDob && extraDetails.dob) profileDob.value = extraDetails.dob;
-      if (profileAddress && extraDetails.address) profileAddress.value = extraDetails.address;
-      if (profileCity && extraDetails.city) profileCity.value = extraDetails.city;
-      if (profileState && extraDetails.state) profileState.value = extraDetails.state;
-      if (profilePincode && extraDetails.pincode) profilePincode.value = extraDetails.pincode;
-    }
-  } catch (e) {
-    console.error('Error loading extra details', e);
-  }
-  
   const upiStatusBadge = document.getElementById('upiStatusBadge');
   const profileUpiId = document.getElementById('profileUpiId');
   
@@ -100,6 +91,34 @@ async function loadProfileData() {
   
   await loadProfileBanks();
   loadSavedCards();
+
+  if (profile.account_type === 'lite') {
+    const bankSection = document.getElementById('profileBanksList')?.closest('.payment-methods-section');
+    if (bankSection) bankSection.style.display = 'none';
+    
+    const emailGroup = document.getElementById('profileEmailInput')?.closest('.form-group');
+    if (emailGroup) emailGroup.style.display = 'none';
+
+    if (!document.getElementById('liteProfileBanner')) {
+      const banner = document.createElement('div');
+      banner.id = 'liteProfileBanner';
+      banner.className = 'lite-banner';
+      banner.style.marginTop = '20px';
+      banner.innerHTML = `
+        <div class="lite-banner-text">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+          </svg>
+          <span><strong>PayMoney Lite:</strong> Connected to parent's account</span>
+        </div>
+        <div class="lite-banner-pill">UPI ID: <span>${profile.upi_id || ''}</span></div>
+      `;
+      const profileContainer = document.querySelector('.profile-container');
+      if (profileContainer) {
+        profileContainer.insertBefore(banner, profileContainer.firstChild);
+      }
+    }
+  }
 }
 
 async function loadProfileBanks() {
@@ -220,16 +239,17 @@ function initAvatarChange() {
       saveAvatarBtn.textContent = 'Saving...';
       
       const user = await getUser();
+      
       try {
-        localStorage.setItem(`profile_avatar_${user.id}`, base64Image);
+        localStorage.setItem(`avatar_${user.id}`, base64Image);
         showNotification('Profile picture updated successfully');
         avatarModal.style.display = 'none';
         saveAvatarBtn.textContent = 'Save Photo';
         saveAvatarBtn.disabled = true;
         await loadProfileData();
         await updateUserInfo();
-      } catch (error) {
-        showNotification('Error saving photo locally', 'error');
+      } catch (err) {
+        showNotification('Error uploading photo', 'error');
         saveAvatarBtn.disabled = false;
         saveAvatarBtn.textContent = 'Save Photo';
       }
@@ -257,20 +277,6 @@ async function handlePersonalInfoUpdate(e) {
   if (error) {
     showNotification('Error updating profile', 'error');
   } else {
-    // Save extra details to localStorage
-    try {
-      const extraDetails = {
-        dob: document.getElementById('profileDob')?.value || '',
-        address: document.getElementById('profileAddress')?.value || '',
-        city: document.getElementById('profileCity')?.value || '',
-        state: document.getElementById('profileState')?.value || '',
-        pincode: document.getElementById('profilePincode')?.value || ''
-      };
-      localStorage.setItem(`profile_extra_${user.id}`, JSON.stringify(extraDetails));
-    } catch (e) {
-      console.error('Error saving extra details', e);
-    }
-    
     showNotification('Profile updated successfully');
     await loadProfileData();
     await updateUserInfo(); // Re-render header
@@ -279,34 +285,172 @@ async function handlePersonalInfoUpdate(e) {
 
 async function handlePasswordChange(e) {
   e.preventDefault();
+  const currentPassword = document.getElementById('currentPassword').value;
   const newPassword = document.getElementById('newPassword').value;
   const confirmNewPassword = document.getElementById('confirmNewPassword').value;
   
-  if (!newPassword || !confirmNewPassword) return;
+  if (!currentPassword || !newPassword || !confirmNewPassword) {
+    showNotification('Please fill in all password fields', 'error');
+    return;
+  }
+
   if (newPassword !== confirmNewPassword) {
     showNotification('New passwords do not match', 'error');
     return;
   }
   
-  if (newPassword.length <= 5) {
-    showNotification('Password must be greater than 5 digits', 'error');
+  if (newPassword.length < 6) {
+    showNotification('Password must be at least 6 characters', 'error');
     return;
   }
   
-  const hashedPassword = await hashPassword(newPassword);
-  const user = await getUser();
-  
-  const { error } = await supabaseClient
-    .from('profiles')
-    .update({ password_hash: hashedPassword })
-    .eq('id', user.id);
-  
-  if (error) {
-    showNotification('Error changing password: ' + error.message, 'error');
-  } else {
-    clearProfileCache();
-    showNotification('Password updated successfully');
+  const user = await getProfile(true);
+  if (!user || !user.email) {
+    showNotification('A registered email is required to change your password', 'error');
+    return;
+  }
+
+  const currentPasswordHash = await hashPassword(currentPassword);
+  if (currentPasswordHash !== user.password_hash) {
+    showNotification('Current password is incorrect', 'error');
+    return;
+  }
+
+  const submitButton = document.querySelector('#changePasswordForm button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending Code...';
+  }
+
+  try {
+    const { error } = await supabaseClient.auth.signInWithOtp({ email: user.email });
+    if (error) throw error;
+
+    pendingPasswordChange = {
+      userId: user.id,
+      email: user.email,
+      currentPasswordHash,
+      newPasswordHash: await hashPassword(newPassword)
+    };
+
     document.getElementById('changePasswordForm').reset();
+    document.getElementById('passwordOtpMessage').textContent =
+      `A verification code has been sent to ${user.email}.`;
+    document.getElementById('changePasswordForm').style.display = 'none';
+    document.getElementById('passwordOtpForm').style.display = 'block';
+    document.getElementById('passwordOtp').focus();
+    showNotification('Verification code sent to your registered email');
+  } catch (error) {
+    console.error('Error sending password change verification code:', error);
+    showNotification(error.message || 'Could not send verification code', 'error');
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Update Password';
+    }
+  }
+}
+
+async function handlePasswordOtpVerification(e) {
+  e.preventDefault();
+  const pendingChange = pendingPasswordChange;
+  const otpInput = document.getElementById('passwordOtp');
+  const otp = otpInput.value.trim();
+
+  if (!pendingChange) {
+    showNotification('Restart the password change process to request a new code', 'error');
+    resetPasswordChange();
+    return;
+  }
+
+  if (!/^\d{6}$/.test(otp)) {
+    showNotification('Enter the 6-digit verification code', 'error');
+    return;
+  }
+
+  const submitButton = document.querySelector('#passwordOtpForm button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Verifying...';
+  }
+
+  let otpVerified = false;
+  let passwordUpdated = false;
+  let verificationSessionCleanupFailed = false;
+  try {
+    const { error: otpError } = await supabaseClient.auth.verifyOtp({
+      email: pendingChange.email,
+      token: otp,
+      type: 'email'
+    });
+    if (otpError) throw new Error(otpError.message || 'Invalid or expired verification code');
+    otpVerified = true;
+
+    const currentProfile = await getProfile(true);
+    if (!currentProfile ||
+        currentProfile.id !== pendingChange.userId ||
+        currentProfile.email !== pendingChange.email ||
+        currentProfile.password_hash !== pendingChange.currentPasswordHash) {
+      throw new Error('Account details changed during verification. Restart the password change process.');
+    }
+
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .update({ password_hash: pendingChange.newPasswordHash })
+      .eq('id', pendingChange.userId)
+      .eq('password_hash', pendingChange.currentPasswordHash)
+      .select('id')
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      throw new Error('Password could not be updated. Restart the password change process.');
+    }
+
+    passwordUpdated = true;
+  } catch (error) {
+    console.error('Error verifying password change code:', error);
+    showNotification(error.message || 'Could not verify the code or update the password', 'error');
+  } finally {
+    if (otpVerified) {
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+      } catch (error) {
+        verificationSessionCleanupFailed = true;
+        console.error('Error clearing temporary email verification session:', error);
+      }
+    }
+
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Verify Code & Update Password';
+    }
+  }
+
+  if (passwordUpdated) {
+    clearProfileCache();
+    resetPasswordChange();
+    showNotification(
+      verificationSessionCleanupFailed
+        ? 'Password updated. Please sign out and back in to clear the verification session.'
+        : 'Password updated successfully',
+      verificationSessionCleanupFailed ? 'error' : 'success'
+    );
+  }
+}
+
+function resetPasswordChange() {
+  pendingPasswordChange = null;
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  const passwordOtpForm = document.getElementById('passwordOtpForm');
+  if (changePasswordForm) {
+    changePasswordForm.reset();
+    changePasswordForm.style.display = '';
+  }
+  if (passwordOtpForm) {
+    passwordOtpForm.reset();
+    passwordOtpForm.style.display = 'none';
   }
 }
 

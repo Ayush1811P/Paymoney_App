@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +10,6 @@
   <link rel="stylesheet" href="css/logo.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 </head>
-
 <body>
   <header class="main-header">
     <div class="header-content">
@@ -33,8 +31,7 @@
             </g>
             <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
             <circle class="cuff-button" cx="15" cy="44" r="2" />
-            <path class="hand"
-              d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
+            <path class="hand" d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
             <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
           </svg>
           <span class="logo-text-css">
@@ -42,7 +39,7 @@
           </span>
         </a>
       </div>
-
+      
       <div class="user-menu">
         <a href="profile.html" class="user-profile">
           <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
@@ -50,7 +47,7 @@
         </a>
         <button id="logoutBtn" class="btn btn-outline">Logout</button>
       </div>
-
+      
       <div class="hamburger-menu">
         <div class="bar"></div>
         <div class="bar"></div>
@@ -58,7 +55,7 @@
       </div>
     </div>
   </header>
-
+  
   <nav class="main-nav">
     <ul class="nav-tabs">
       <li><a href="dashboard.html">Wallet</a></li>
@@ -67,7 +64,7 @@
       <li class="active"><a href="profile.html">Profile</a></li>
     </ul>
   </nav>
-
+  
   <div class="mobile-menu">
     <ul>
       <li><a href="dashboard.html">Wallet</a></li>
@@ -77,22 +74,21 @@
       <li><a href="#" id="mobileLogout">Logout</a></li>
     </ul>
   </div>
-
+  
   <main class="profile-container">
     <section class="profile-header">
       <div class="profile-avatar-container">
         <img id="profileAvatar" src="img/default-avatar.png" alt="Profile Avatar">
         <button id="changeAvatarBtn" class="change-avatar-btn">
           <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor"
-              d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+            <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
           </svg>
         </button>
       </div>
       <h2 id="profileName">John Doe</h2>
       <p id="profileEmail">Add your email</p>
     </section>
-
+    
     <section class="profile-content">
       <div class="profile-tabs">
         <button class="profile-tab active" data-tab="personal">Personal Details</button>
@@ -100,7 +96,7 @@
         <button class="profile-tab" data-tab="payment">Payment Methods</button>
         <button class="profile-tab" data-tab="kyc">KYC & Documents</button>
       </div>
-
+      
       <div class="profile-tab-content">
         <!-- Personal Details Tab -->
         <div class="tab-pane active" id="personalTab">
@@ -111,12 +107,8 @@
                 <label for="fullName">Full Name</label>
                 <input type="text" id="fullName" value="John Doe">
               </div>
-              <div class="form-group">
-                <label for="profileDob">Date of Birth</label>
-                <input type="date" id="profileDob">
-              </div>
             </div>
-
+            
             <div class="form-row">
               <div class="form-group">
                 <label for="profileEmailInput">Email Address</label>
@@ -129,46 +121,26 @@
                 <small>Primary phone number cannot be changed</small>
               </div>
             </div>
-
-            <div class="form-group">
-              <label for="profileAddress">Address</label>
-              <textarea id="profileAddress" rows="3" placeholder="Enter your address"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="profileCity">City</label>
-                <input type="text" id="profileCity" placeholder="Enter city">
-              </div>
-              <div class="form-group">
-                <label for="profileState">State</label>
-                <input type="text" id="profileState" placeholder="Enter state">
-              </div>
-              <div class="form-group">
-                <label for="profilePincode">Pincode</label>
-                <input type="text" id="profilePincode" placeholder="Enter pincode">
-              </div>
-            </div>
-
+            
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
         </div>
-
+        
         <!-- Security Tab -->
         <div class="tab-pane" id="securityTab">
           <h3>Security Settings</h3>
-
+          
           <div class="security-section">
             <h4>Change Password</h4>
             <form id="changePasswordForm">
               <div class="form-group">
                 <label for="currentPassword">Current Password</label>
-                <input type="password" id="currentPassword" required placeholder="Enter current password">
+                <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="Enter current password">
               </div>
-
+              
               <div class="form-group">
                 <label for="newPassword">New Password</label>
-                <input type="password" id="newPassword" required placeholder="Enter new password">
+                <input type="password" id="newPassword" required minlength="6" autocomplete="new-password" placeholder="Enter new password">
                 <div class="password-strength">
                   <div class="strength-meter">
                     <div class="strength-bar" style="width: 0%"></div>
@@ -176,16 +148,25 @@
                   <span class="strength-text">Password strength</span>
                 </div>
               </div>
-
+              
               <div class="form-group">
                 <label for="confirmNewPassword">Confirm New Password</label>
-                <input type="password" id="confirmNewPassword" required placeholder="Confirm new password">
+                <input type="password" id="confirmNewPassword" required minlength="6" autocomplete="new-password" placeholder="Confirm new password">
               </div>
-
+              
               <button type="submit" class="btn btn-primary">Update Password</button>
             </form>
+            <form id="passwordOtpForm" style="display: none;">
+              <p id="passwordOtpMessage" class="security-info"></p>
+              <div class="form-group">
+                <label for="passwordOtp">Email verification code</label>
+                <input type="text" id="passwordOtp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required placeholder="Enter 6-digit code">
+              </div>
+              <button type="submit" class="btn btn-primary">Verify Code &amp; Update Password</button>
+              <button type="button" id="cancelPasswordOtpBtn" class="btn btn-outline">Cancel</button>
+            </form>
           </div>
-
+          
           <div class="security-section">
             <h4>Two-Factor Authentication</h4>
             <div class="toggle-container">
@@ -195,10 +176,9 @@
                 <span class="slider"></span>
               </label>
             </div>
-            <p class="security-info">Two-factor authentication adds an extra layer of security to your account by
-              requiring access to your phone as well as your password.</p>
+            <p class="security-info">Two-factor authentication adds an extra layer of security to your account by requiring access to your phone as well as your password.</p>
           </div>
-
+          
           <div class="security-section">
             <h4>Login & Security</h4>
             <div class="toggle-container">
@@ -217,11 +197,11 @@
             </div>
           </div>
         </div>
-
+        
         <!-- Payment Methods Tab -->
         <div class="tab-pane" id="paymentTab">
           <h3>Payment Methods</h3>
-
+          
           <div class="payment-methods-section">
             <h4>Saved Cards</h4>
             <div id="savedCardsList" class="saved-cards-list">
@@ -232,7 +212,7 @@
               </div>
             </div>
           </div>
-
+          
           <div class="payment-methods-section">
             <h4>Bank Accounts</h4>
             <div id="profileBanksList" class="banks-list">
@@ -243,7 +223,7 @@
               </div>
             </div>
           </div>
-
+          
           <div class="payment-methods-section">
             <h4>UPI</h4>
             <div id="profileUpiSection" class="profile-upi-section">
@@ -256,11 +236,11 @@
             </div>
           </div>
         </div>
-
+        
         <!-- KYC Tab -->
         <div class="tab-pane" id="kycTab">
           <h3>KYC & Documents</h3>
-
+          
           <div class="kyc-status">
             <div class="kyc-status-header">
               <h4>KYC Status</h4>
@@ -268,7 +248,7 @@
             </div>
             <p>Complete your KYC to unlock all features and higher transaction limits.</p>
           </div>
-
+          
           <div class="kyc-section">
             <h4>Identity Proof</h4>
             <div class="document-upload">
@@ -280,13 +260,13 @@
                   <option value="drivingLicense">Driving License</option>
                 </select>
               </div>
-
+              
               <div class="upload-area">
                 <input type="file" id="idProofUpload" accept="image/*" hidden>
                 <label for="idProofUpload" class="upload-label">
                   <div class="upload-icon">
                     <svg viewBox="0 0 24 24" width="24" height="24">
-                      <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+                      <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
                     </svg>
                   </div>
                   <span>Upload Document</span>
@@ -294,7 +274,7 @@
               </div>
             </div>
           </div>
-
+          
           <div class="kyc-section">
             <h4>Address Proof</h4>
             <div class="document-upload">
@@ -306,13 +286,13 @@
                   <option value="bankStatement">Bank Statement</option>
                 </select>
               </div>
-
+              
               <div class="upload-area">
                 <input type="file" id="addressProofUpload" accept="image/*" hidden>
                 <label for="addressProofUpload" class="upload-label">
                   <div class="upload-icon">
                     <svg viewBox="0 0 24 24" width="24" height="24">
-                      <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+                      <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
                     </svg>
                   </div>
                   <span>Upload Document</span>
@@ -320,13 +300,13 @@
               </div>
             </div>
           </div>
-
+          
           <button id="submitKycBtn" class="btn btn-primary">Submit KYC Documents</button>
         </div>
       </div>
     </section>
   </main>
-
+  
   <!-- Change Avatar Modal -->
   <div id="avatarModal" class="modal">
     <div class="modal-content">
@@ -336,7 +316,7 @@
         <div class="avatar-preview">
           <img id="avatarPreview" src="img/default-avatar.png" alt="Avatar Preview">
         </div>
-
+        
         <div class="avatar-upload-controls">
           <input type="file" id="avatarUpload" accept="image/*" hidden>
           <label for="avatarUpload" class="btn btn-secondary">Choose Photo</label>
@@ -345,7 +325,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Add Card Modal -->
   <div id="addCardModal" class="modal">
     <div class="modal-content">
@@ -356,7 +336,7 @@
           <label for="cardNumber">Card Number</label>
           <input type="text" id="cardNumber" required placeholder="1234 5678 9012 3456" maxlength="19">
         </div>
-
+        
         <div class="form-row">
           <div class="form-group">
             <label for="cardExpiry">Expiry Date</label>
@@ -367,28 +347,26 @@
             <input type="password" id="cardCvv" required placeholder="123" maxlength="3">
           </div>
         </div>
-
+        
         <div class="form-group">
           <label for="cardHolderName">Name on Card</label>
           <input type="text" id="cardHolderName" required placeholder="Enter name as on card">
         </div>
-
+        
         <div class="form-group terms">
           <input type="checkbox" id="saveCardConsent" required>
           <label for="saveCardConsent">I authorize PayMoney to securely save my card for future payments</label>
         </div>
-
+        
         <button type="submit" class="btn btn-primary">Add Card</button>
       </form>
     </div>
   </div>
-
-  <div id="notification" class="notification"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <div id="notification" class="notification"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
-
+  
   <script src="js/utils.js"></script>
   <script src="js/profile.js"></script>
 </body>
-
 </html>

@@ -130,7 +130,7 @@
 }
 
 .chat-header {
-  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark) 65%, #8a6420);
   color: var(--text-white);
   padding: var(--spacing-md);
   display: flex;
@@ -138,6 +138,7 @@
   gap: var(--spacing-sm);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .chat-agent-avatar {
@@ -210,7 +211,7 @@
 
 .chat-bubble.user {
   background-color: var(--primary-color);
-  color: var(--text-white);
+  color: var(--secondary-color);
   align-self: flex-end;
   border-bottom-right-radius: 2px;
 }
@@ -254,7 +255,7 @@
 .quick-reply-btn {
   background-color: var(--bg-white);
   border: 1px solid var(--primary-color);
-  color: var(--primary-color);
+  color: var(--primary-dark);
   padding: 6px 12px;
   border-radius: 16px;
   font-size: var(--font-size-xs);
@@ -265,7 +266,7 @@
 
 .quick-reply-btn:hover {
   background-color: var(--primary-color);
-  color: var(--text-white);
+  color: var(--secondary-color);
 }
 
 /* Chat Input Footer */
@@ -294,7 +295,7 @@
 
 .chat-send-btn {
   background-color: var(--primary-color);
-  color: var(--text-white);
+  color: var(--secondary-color);
   border: none;
   width: 40px;
   height: 40px;
@@ -383,7 +384,7 @@
     border: none;
     padding: 12px 20px;
     border-radius: 30px;
-    box-shadow: 0 4px 15px rgba(0, 186, 242, 0.4);
+    box-shadow: 0 4px 15px rgba(212, 162, 76, .4);
     z-index: 1000;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -403,7 +404,7 @@
 
   .floating-chat-btn:hover {
     transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 6px 20px rgba(0, 186, 242, 0.5);
+    box-shadow: 0 6px 20px rgba(212, 162, 76, .5);
   }
 
   .floating-chat-btn:active {

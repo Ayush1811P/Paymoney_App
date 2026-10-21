@@ -1,202 +1,803 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAYMONEY - India's Leading Payment App</title>
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/home.css">
-  <link rel="stylesheet" href="css/logo.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PayMoney – Send money, pay bills, recharge</title>
+<script>
+  const signedInUserId = localStorage.getItem('paymoney_user_id');
+  if (signedInUserId) {
+    const homePage = localStorage.getItem('paymoney_account_type') === 'lite'
+      ? 'lite-dashboard.html'
+      : 'dashboard.html';
+    window.location.replace(homePage);
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0a0a0a;--deep:#171512;--sky:#d4a24c;--sky-soft:#f6e6c6;--ink:#1a1712;--muted:#6f675a;--line:#e8dcc2;--bg:#f8f1e4;--ok:#1fa971;--ease:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:Roboto,system-ui,sans-serif;color:var(--ink);background:#f8f1e4;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+#bar{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sky),var(--deep));transform:scaleX(0);transform-origin:0;z-index:50}
+
+header{position:sticky;top:0;z-index:20;background:rgba(248,241,228,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);transition:box-shadow .3s}
+header.scrolled{box-shadow:0 6px 24px rgba(10,10,10,.1)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.6rem;letter-spacing:-.5px;color:var(--navy)}
+.brand b{color:var(--sky)}
+nav ul{display:flex;gap:32px;list-style:none;font-weight:500}
+nav ul a{position:relative;padding:4px 0}
+nav ul a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:100%;background:var(--sky);transform:scaleX(0);transform-origin:right;transition:transform .35s var(--ease)}
+nav ul a:hover::after{transform:scaleX(1);transform-origin:left}
+.actions{display:flex;gap:12px}
+.btn{position:relative;overflow:hidden;display:inline-block;padding:11px 24px;border-radius:10px;font-weight:500;border:1.5px solid var(--sky);transition:transform .25s var(--ease),background .2s,box-shadow .25s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(212,162,76,.35)}
+.btn:active{transform:scale(.97)}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:40%;height:100%;background:rgba(255,255,255,.4);transform:skewX(-20deg);transition:left .6s}
+.btn:hover::after{left:130%}
+.btn-fill{background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);color:var(--navy);font-weight:700}
+.btn-line{color:var(--sky);background:#fff}
+.btn-lg{padding:14px 30px;font-size:1.05rem}
+
+/* intro */
+#intro{display:none;position:fixed;inset:0;z-index:100;pointer-events:none}
+.intro #intro{display:block}
+html.intro{overflow:hidden}
+.bgc{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,var(--deep),var(--navy) 70%)}
+.il{position:fixed;left:0;top:0;transform-origin:0 0;color:#fff;opacity:0;will-change:transform}
+.pulse{position:absolute;left:50%;top:50%;width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;border:2px solid var(--sky);opacity:0;animation:pulse2 1.3s .45s ease-out}
+@keyframes pulse2{0%{opacity:.8;transform:scale(.6)}100%{opacity:0;transform:scale(4.5)}}
+.intro .nav .brand{visibility:hidden}
+.intro .nav nav,.intro .actions{opacity:0}
+.intro.flying .nav nav,.intro.flying .actions{opacity:1}
+.nav nav,.actions{transition:opacity .7s}
+.js:not(.ready) .w>span,.js:not(.ready) .fadeup{animation-play-state:paused}
+
+/* hero */
+.hero{position:relative;background:linear-gradient(135deg,var(--navy),var(--deep) 55%,#8a6420);background-size:160% 160%;animation:drift 14s ease-in-out infinite alternate;color:#fff;overflow:hidden}
+@keyframes drift{to{background-position:100% 100%}}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none}
+.b1{width:420px;height:420px;background:var(--sky);top:-120px;right:8%;animation:fl1 11s ease-in-out infinite alternate}
+.b2{width:320px;height:320px;background:#b8832e;bottom:-140px;left:32%;animation:fl2 13s ease-in-out infinite alternate}
+@keyframes fl1{to{transform:translate(-90px,80px) scale(1.15)}}
+@keyframes fl2{to{transform:translate(110px,-60px) scale(.9)}}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;min-height:640px;padding-top:56px;padding-bottom:56px}
+.hero h1{font-size:clamp(2.3rem,5vw,3.7rem);line-height:1.1;font-weight:900;letter-spacing:-1.2px;max-width:13ch}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+.w>span{display:inline-block;transform:translateY(115%);animation:rise .9s calc(var(--i)*.09s + .15s) var(--ease) forwards}
+@keyframes rise{to{transform:none}}
+.hero p{font-size:1.2rem;opacity:.92;margin:22px 0 32px;max-width:46ch}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero .btn-line{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.hero .note{font-size:.95rem;opacity:.8;margin:22px 0 0}
+.fadeup{opacity:0;transform:translateY(18px);animation:fu .8s calc(.7s + var(--d,0s)) var(--ease) forwards}
+@keyframes fu{to{opacity:1;transform:none}}
+
+.stage{position:relative;display:flex;justify-content:center;perspective:1000px}
+.float{animation:bob 5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-14px)}}
+.phone{width:290px;border:1.5px solid rgba(212,162,76,.55);background:#0a0a0a;border-radius:38px;padding:12px;box-shadow:0 40px 80px rgba(0,0,0,.55);transition:transform .2s ease-out;transform-style:preserve-3d}
+.screen{background:var(--bg);border-radius:28px;padding:20px 16px 18px;color:var(--ink);min-height:520px;overflow:hidden}
+.top{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:14px}
+.bal{background:linear-gradient(135deg,#f3d9a0,var(--sky) 55%,#b8832e);color:var(--navy);border-radius:18px;padding:18px;position:relative;overflow:hidden}
+.bal::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:rgba(255,255,255,.25);transform:skewX(-20deg);animation:sheen 4.5s 1.5s infinite}
+@keyframes sheen{to{left:140%}}
+.bal small{opacity:.85}.bal span{font-size:.8rem;opacity:.85}
+.bal strong{display:block;font-size:2rem;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.quick div{text-align:center;font-size:.68rem;color:var(--muted)}
+.quick i{display:block;height:44px;border-radius:14px;background:#fffaf1;border:1px solid var(--line);margin-bottom:4px;position:relative}
+.quick i::after{content:"";position:absolute;inset:14px;border-radius:6px;background:var(--sky)}
+.quick div:nth-child(2) i::after{background:#ffb84d}.quick div:nth-child(3) i::after{background:var(--ok)}.quick div:nth-child(4) i::after{background:#b8832e}
+.quick div{animation:pulse 3.6s infinite}.quick div:nth-child(2){animation-delay:.3s}.quick div:nth-child(3){animation-delay:.6s}.quick div:nth-child(4){animation-delay:.9s}
+@keyframes pulse{0%,70%,100%{transform:none}80%{transform:translateY(-5px)}}
+#feed{height:150px;overflow:hidden}
+.tx{background:#fffaf1;border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:8px;animation:slidein .5s var(--ease)}
+@keyframes slidein{from{opacity:0;transform:translateY(-24px)}}
+.tx em{font-style:normal;font-weight:700}.out{color:#d64545}.in{color:var(--ok)}
+.sent{position:absolute;left:-10px;bottom:56px;background:#fffaf1;color:var(--ink);border-radius:16px;padding:14px 18px;box-shadow:0 18px 40px rgba(0,0,0,.35);display:flex;gap:12px;align-items:center;opacity:0;pointer-events:none}
+.sent.show{animation:pop 2.4s var(--ease)}
+@keyframes pop{0%{opacity:0;transform:translateY(16px) scale(.9)}12%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+.tick{width:34px;height:34px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700}
+.sent b{display:block;font-size:.95rem}.sent span{font-size:.8rem;color:var(--muted)}
+
+/* sections */
+section{padding:88px 0}
+h2{font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.2;letter-spacing:-.6px;font-weight:700;color:var(--navy);max-width:22ch}
+.lead{color:var(--muted);font-size:1.1rem;max-width:56ch;margin-top:12px}
+.js .rv{opacity:0;transform:translateY(30px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0)*100ms)}
+.js .rv.in{opacity:1;transform:none}
+
+/* marquee */
+.mq{background:var(--bg);border-block:1px solid var(--line);padding:18px 0;overflow:hidden}
+.track{display:flex;gap:56px;width:max-content;animation:mq 30s linear infinite;font-weight:700;font-size:1.15rem;color:var(--navy);opacity:.7}
+.mq:hover .track{animation-play-state:paused}
+.track span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--sky);margin-right:14px}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+.feat{display:grid;grid-template-columns:1fr 1.15fr;gap:32px;margin-top:44px}
+.big{background:var(--navy);color:#fff;border-radius:24px;padding:40px;position:relative;overflow:hidden}
+.big::before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;background:var(--sky);opacity:.18;filter:blur(40px);right:-80px;top:-80px;animation:fl1 9s ease-in-out infinite alternate}
+.big h3{font-size:1.6rem;line-height:1.25;margin-bottom:12px}
+.big p{opacity:.85;margin-bottom:24px}
+.chip{display:inline-block;background:rgba(255,255,255,.12);border-radius:999px;padding:6px 14px;font-size:.9rem;margin:0 6px 8px 0;transition:background .2s,transform .3s var(--ease)}
+.chip:hover{color:var(--navy);background:var(--sky);transform:translateY(-3px)}
+.list{display:flex;flex-direction:column;justify-content:space-between}
+.row{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--line);transition:transform .35s var(--ease)}
+.row:hover{transform:translateX(10px)}
+.row:first-child{padding-top:0}.row:last-child{border:0;padding-bottom:0}
+.ico{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;font-weight:700;transition:transform .5s var(--ease)}
+.row:hover .ico{transform:rotate(360deg) scale(1.1)}
+.row h3{font-size:1.15rem;color:var(--navy)}.row p{color:var(--muted);font-size:.98rem}
+
+/* sticky steps */
+.how{background:var(--bg)}
+.how-grid{display:grid;grid-template-columns:1fr 340px;gap:64px;align-items:start}
+.stp{min-height:62vh;display:flex;flex-direction:column;justify-content:center;opacity:.35;transition:opacity .5s,transform .5s var(--ease);border-left:3px solid var(--line);padding-left:28px}
+.stp.on{opacity:1;transform:translateX(8px);border-color:var(--sky)}
+.stp h3{font-size:1.5rem;color:var(--navy);margin-bottom:8px}.stp p{color:var(--muted);max-width:40ch}
+.stp:first-of-type{margin-top:24px}
+.sticky{position:sticky;top:110px}
+.sticky .screen{position:relative;min-height:470px}
+.scr{position:absolute;inset:20px 16px;opacity:0;transform:scale(.96);transition:opacity .5s,transform .5s var(--ease);pointer-events:none}
+.scr.on{opacity:1;transform:none}
+.scr h4{color:var(--navy);margin-bottom:16px;font-size:1.1rem}
+.fld{height:42px;background:#fffaf1;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:14px 12px}
+.fld i{display:block;height:8px;border-radius:4px;background:var(--sky);width:0}
+.scr.on .fld i{animation:type 1.1s calc(var(--k)*.5s + .3s) var(--ease) forwards}
+@keyframes type{to{width:var(--w)}}
+.otp{display:flex;gap:6px;margin-top:18px}
+.otp b{flex:1;height:44px;border-radius:10px;background:#fffaf1;border:1.5px solid var(--sky);display:grid;place-items:center;color:var(--navy);opacity:0}
+.scr.on .otp b{animation:pop2 .4s calc(var(--k)*.15s + 1.8s) var(--ease) forwards}
+@keyframes pop2{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+.bank{background:#fffaf1;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;font-size:.85rem;transform:translateX(120%)}
+.scr.on .bank{animation:sl .6s .2s var(--ease) forwards}
+@keyframes sl{to{transform:none}}
+.bank i{width:34px;height:34px;border-radius:10px;background:var(--deep)}
+.dots{display:flex;gap:14px;justify-content:center;margin:34px 0 10px}
+.dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--sky)}
+.scr.on .dots i{animation:fill .3s calc(var(--k)*.4s + 1s) forwards}
+@keyframes fill{to{background:var(--sky);transform:scale(1.2)}}
+.pay{text-align:center;padding-top:26px}
+.pay .amt{font-size:2.4rem;font-weight:900;color:var(--navy)}
+.ring{width:110px;height:110px;margin:20px auto}
+.ring circle,.ring path{fill:none;stroke:var(--ok);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.scr.on .ring circle{animation:draw .8s .3s forwards}
+.scr.on .ring path{animation:draw .5s 1s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* fd calculator */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:40px}
+.plans{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 26px}
+.plans button{font:inherit;padding:10px 18px;border-radius:999px;border:1.5px solid var(--line);background:#fffaf1;cursor:pointer;transition:all .25s var(--ease)}
+.plans button:hover{border-color:var(--sky)}
+.plans button.on{background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);border-color:var(--sky);color:var(--navy);transform:scale(1.06)}
+input[type=range]{width:100%;accent-color:var(--sky);height:6px}
+.amt-l{display:flex;justify-content:space-between;font-weight:500;margin-bottom:10px}
+.result{background:var(--navy);color:#fff;border-radius:24px;padding:36px}
+.result small{opacity:.8}
+.result strong{display:block;font-size:2.8rem;font-weight:900;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.split{display:flex;height:14px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.15);margin:20px 0 10px}
+.split i{display:block;transition:width .7s var(--ease)}
+.split .p{background:#fff}.split .g{background:var(--sky)}
+.legend{display:flex;justify-content:space-between;font-size:.9rem;opacity:.9}
+
+/* lite */
+.lite{background:linear-gradient(180deg,var(--sky-soft),#f8f1e4)}
+.lite-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.lite .row{border:0;padding:14px 0}
+.lite .btn{margin-top:22px}
+.lk{max-width:420px;width:100%;margin:0 auto}
+.acc{background:#fffaf1;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 20px 50px rgba(10,10,10,.12)}
+.acc.par{background:var(--navy);color:#fff;border:0}
+.who{display:flex;align-items:center;gap:12px}
+.who small{display:block;opacity:.75;font-size:.8rem}
+.av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);color:var(--navy);display:grid;place-items:center;font-weight:700}
+.pill{margin-left:auto;font-size:.75rem;font-weight:700;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);color:var(--navy);border-radius:999px;padding:3px 10px}
+.link{height:64px;width:3px;margin:0 auto;background:repeating-linear-gradient(var(--sky) 0 6px,transparent 6px 12px);position:relative}
+.link::after{content:"";position:absolute;left:50%;top:0;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--sky);box-shadow:0 0 0 6px rgba(212,162,76,.25);animation:trav 1.8s ease-in-out infinite alternate}
+@keyframes trav{to{top:calc(100% - 12px)}}
+.link span{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:.8rem;color:var(--muted);white-space:nowrap}
+.spent{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 8px;color:var(--muted);font-size:.9rem}
+.spent strong{font-size:1.5rem;color:var(--navy);font-variant-numeric:tabular-nums}
+.acc ul{list-style:none}
+.acc li{display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line);font-size:.92rem}
+.lite-vis.in li{animation:slidein .5s calc(var(--k)*.25s + .6s) var(--ease) backwards}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:40px}
+.facts div{border-left:3px solid var(--sky);padding-left:18px}
+.facts strong{display:block;font-size:2.1rem;line-height:1.1;color:var(--navy);font-weight:900}
+.facts span{color:var(--muted);font-size:.95rem}
+
+.dl{background:linear-gradient(135deg,var(--navy),var(--deep));color:#fff}
+.dl .wrap{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
+.dl h2{color:#fff}.dl .lead{color:rgba(255,255,255,.8)}
+.soon{display:inline-block;background:var(--sky);color:var(--navy);font-size:.8rem;font-weight:700;padding:3px 12px;border-radius:999px;vertical-align:middle;margin-left:10px;animation:glow 2s infinite}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(212,162,76,.7)}100%{box-shadow:0 0 0 14px rgba(212,162,76,0)}}
+.stores{display:flex;gap:14px}
+.store{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px 22px;line-height:1.3;cursor:not-allowed;transition:transform .3s var(--ease)}
+.store:hover{transform:translateY(-4px)}
+.store small{display:block;font-size:.75rem;opacity:.8}.store b{font-size:1.1rem}
+
+footer{background:#050505;color:#d9d2c2;padding:56px 0 28px}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+footer .brand{color:#fff}footer h4{color:#fff;margin-bottom:12px}
+footer li{list-style:none;margin-bottom:8px}footer li a{transition:color .2s,padding .3s}footer li a:hover{color:var(--sky);padding-left:6px}
+.copy{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);font-size:.9rem}
+
+/* extra motion */
+.hero .wrap{z-index:2}
+.spot,.coin,.blob{z-index:1}
+.blob{translate:0 var(--bp,0px)}
+.stage{translate:0 var(--py,0px)}
+.spot{position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at var(--mx,70%) var(--my,40%),rgba(255,255,255,.15),transparent 60%);opacity:0;transition:opacity .4s}
+.hero:hover .spot{opacity:1}
+.coin{position:absolute;bottom:-50px;color:rgba(255,255,255,.22);font-weight:900;pointer-events:none;animation:rise2 linear infinite}
+@keyframes rise2{0%{opacity:0}10%{opacity:1}100%{transform:translateY(-820px) rotate(360deg);opacity:0}}
+.fchip{position:absolute;background:#fffaf1;color:var(--navy);border-radius:14px;padding:10px 14px;font-weight:700;font-size:.85rem;box-shadow:0 14px 30px rgba(0,0,0,.3);animation:bob 4s ease-in-out infinite alternate}
+.fc1{top:34px;right:-18px}
+.fc2{top:250px;left:-46px;animation-duration:5.2s;animation-delay:-2s}
+h2{position:relative;padding-bottom:14px}
+h2::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:64px;border-radius:2px;background:linear-gradient(90deg,var(--sky),var(--deep));transform:scaleX(0);transform-origin:left;transition:transform .9s .4s var(--ease)}
+h2.in::after{transform:scaleX(1)}
+.dl h2::after{background:var(--sky)}
+.track.rev{animation-direction:reverse;animation-duration:38s;margin-top:12px;opacity:.45}
+.big::after,.result::after{content:"";position:absolute;inset:0;background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.15),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.big:hover::after,.result:hover::after{opacity:1}
+.result{position:relative;overflow:hidden}
+.result.bump{animation:bump .45s var(--ease)}
+@keyframes bump{40%{transform:scale(1.025);box-shadow:0 0 0 7px rgba(212,162,76,.25)}}
+.split .g{background:linear-gradient(90deg,var(--sky),#f3d9a0,var(--sky));background-size:200% 100%;animation:shim 2s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+[data-tilt]{transition:transform .25s ease-out}
+.btn-lg{transition:transform .25s var(--ease),translate .25s var(--ease),background .2s,box-shadow .25s}
+.conf{position:absolute;left:50%;top:40%;width:8px;height:12px;border-radius:2px;pointer-events:none;animation:conf 1.2s var(--ease) forwards}
+@keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+.acc .av{position:relative}
+.acc .av::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--sky);animation:ping 2s infinite}
+@keyframes ping{to{transform:scale(1.9);opacity:0}}
+.link::before{content:"";position:absolute;left:50%;top:0;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--ok);animation:trav 1.8s -.9s ease-in-out infinite alternate}
+.dl{position:relative;overflow:hidden}
+.dl .wrap{position:relative}
+.dl::before,.dl::after{content:"";position:absolute;border-radius:50%;border:2px dashed rgba(212,162,76,.3);width:360px;height:360px;right:-70px;top:50%;margin-top:-180px;animation:spinr 14s linear infinite}
+.dl::after{width:580px;height:580px;margin-top:-290px;right:-180px;animation-duration:22s;animation-direction:reverse}
+
+/* numbered steps + lite button */
+.stp h3{display:flex;align-items:center;gap:14px}
+.sn{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;font-weight:900;color:#0a0a0a;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);box-shadow:0 6px 16px rgba(212,162,76,.4);transition:transform .5s var(--ease)}
+.stp.on .sn{transform:scale(1.12)}
+.stp p{margin-left:52px}
+.lite .btn.btn-fill{color:#000}
+/* feature box scenes */
+.big{display:flex;flex-direction:column;padding:28px 32px 22px}
+.big>*{position:relative;z-index:1}
+.stg{position:relative;flex:1;min-height:420px}
+.sc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:none}
+.sc.on{opacity:1}
+.nav2{display:flex;justify-content:center;gap:8px;padding-top:14px}
+.nav2 button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.25);cursor:pointer;transition:width .35s var(--ease),background .3s}
+.nav2 button.on{width:28px;background:var(--sky)}
+.list .row.act{transform:translateX(10px)}
+.list .row.act .ico{transform:scale(1.12)}
+.list .row.act h3{color:#b8832e}
+@keyframes bxpop{from{opacity:0;transform:scale(.6)}}
+@keyframes bxrise{from{opacity:0;transform:translateY(16px)}}
+@keyframes bxtype{from{width:0}}
+/* 1 recharge */
+.rch{display:flex;align-items:center;gap:14px}
+.ph{width:210px;display:grid;gap:10px;padding:16px;border-radius:24px;background:rgba(255,255,255,.06);border:1px solid rgba(212,162,76,.4)}
+.ph-sig{display:flex;gap:3px;align-items:flex-end;height:18px;justify-self:end}
+.ph-sig i{width:5px;border-radius:2px;background:var(--sky);transform-origin:bottom}
+.ph-sig i:nth-child(1){height:6px}.ph-sig i:nth-child(2){height:10px}.ph-sig i:nth-child(3){height:14px}.ph-sig i:nth-child(4){height:18px}
+.ph-num{font-size:1.1rem;color:#fff;white-space:nowrap}
+.num{display:inline-block;overflow:hidden;vertical-align:bottom;width:11ch}
+.ph-op{display:inline-flex;align-items:center;gap:8px;justify-self:start;font-size:.78rem;padding:4px 12px;border-radius:99px;border:1px solid rgba(212,162,76,.5);color:var(--sky)}
+.ph-op i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.ph-plan{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(212,162,76,.12);font-size:.75rem;color:rgba(255,255,255,.7)}
+.ph-plan b{font-size:1.2rem;color:var(--sky)}
+.ph-btn{position:relative;height:40px;border-radius:12px;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);color:#0a0a0a;font-weight:700;font-size:.9rem}
+.ph-btn span{position:absolute;inset:0;display:grid;place-items:center}
+.ph-btn .b1{opacity:0}
+.beam{position:relative;width:34px;height:2px;background:repeating-linear-gradient(90deg,rgba(212,162,76,.6) 0 5px,transparent 5px 10px)}
+.beam i{position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--sky);box-shadow:0 0 10px var(--sky);opacity:0}
+.tv{width:132px;display:grid;justify-items:center;gap:8px}
+.tv-scr{width:100%;height:86px;border-radius:12px;border:2px solid rgba(212,162,76,.55);background:#101010;display:grid;align-content:center;justify-items:center;gap:8px}
+.tv-scr b{font-size:.85rem;color:var(--sky)}
+.chs{display:flex;gap:5px}.chs i{width:18px;height:12px;border-radius:3px;background:var(--sky)}
+.tv-ok{font-size:.75rem;font-weight:700;color:#0a0a0a;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);border-radius:99px;padding:3px 12px}
+.sc.on .num{animation:bxtype 1.2s .3s steps(11) backwards}
+.sc.on .ph-op{animation:bxpop .4s 1.7s backwards}
+.sc.on .ph-plan{animation:bxrise .5s 2.1s backwards}
+.sc.on .ph-btn{animation:bxpress 5.6s}
+@keyframes bxpress{0%,50%{transform:none}54%{transform:scale(.94)}60%,100%{transform:none}}
+.sc.on .b1{animation:bxb1 5.6s}.sc.on .b2{animation:bxb2 5.6s}
+@keyframes bxb1{0%,54%{opacity:1}58%,100%{opacity:0}}
+@keyframes bxb2{0%,54%{opacity:0}58%,100%{opacity:1}}
+.sc.on .ph-sig i{animation:bxsig .4s backwards}
+.sc.on .ph-sig i:nth-child(1){animation-delay:3.5s}.sc.on .ph-sig i:nth-child(2){animation-delay:3.62s}.sc.on .ph-sig i:nth-child(3){animation-delay:3.74s}.sc.on .ph-sig i:nth-child(4){animation-delay:3.86s}
+@keyframes bxsig{from{opacity:.15;transform:scaleY(.3)}}
+.sc.on .beam i{animation:bxbeam 1s 3.4s backwards}
+@keyframes bxbeam{0%{left:0;opacity:0}10%,90%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+.sc.on .tv{animation:bxrise .6s .4s backwards}
+.sc.on .chs i{animation:bxch .4s backwards}
+.sc.on .chs i:nth-child(1){animation-delay:4s}.sc.on .chs i:nth-child(2){animation-delay:4.15s}.sc.on .chs i:nth-child(3){animation-delay:4.3s}.sc.on .chs i:nth-child(4){animation-delay:4.45s}
+@keyframes bxch{from{opacity:.15}}
+.sc.on .tv-ok{animation:bxpop .4s 4.6s backwards}
+/* 2 bills */
+.bill{display:grid;justify-items:center;gap:12px;width:100%;max-width:320px}
+.ico2{display:flex;gap:36px;margin-bottom:6px}
+.bulb .glass{fill:#f3d9a0;filter:drop-shadow(0 0 12px rgba(212,162,76,.9))}
+.bulb .base{fill:rgba(255,255,255,.45)}
+.bulb .rays{stroke:var(--sky);stroke-width:2.5;stroke-linecap:round;fill:none}
+.wifi{fill:var(--sky)}.wifi path{fill:none;stroke:var(--sky);stroke-width:4.5;stroke-linecap:round}
+.bl{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(212,162,76,.25);font-size:.92rem;color:#fff}
+.bl b{color:var(--sky);font-variant-numeric:tabular-nums;margin-left:auto}
+.st{position:relative;flex:none;width:60px;height:22px}
+.st span{position:absolute;right:0;top:0;font-size:.72rem;font-weight:700;border-radius:99px;padding:2px 10px;white-space:nowrap;font-style:normal}
+.st .due{color:#ff9a9a;border:1px solid rgba(255,154,154,.5);opacity:0}
+.st .paid{color:#0a0a0a;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e)}
+.sc.on .bulb .glass{animation:bxbulb 5s}
+@keyframes bxbulb{0%,28%{fill:rgba(255,255,255,.08);filter:none}34%,100%{fill:#f3d9a0;filter:drop-shadow(0 0 12px rgba(212,162,76,.9))}}
+.sc.on .bulb .rays{animation:bxray 5s}
+@keyframes bxray{0%,28%{opacity:0}34%,100%{opacity:1}}
+.sc.on .wifi path,.sc.on .wifi circle{animation:bxwf 5s}
+.sc.on .wifi .w2{animation-delay:.15s}.sc.on .wifi .w3{animation-delay:.3s}
+@keyframes bxwf{0%,56%{opacity:.12}62%,100%{opacity:1}}
+.sc.on .r1{animation:bxrise .5s .2s backwards}.sc.on .r2{animation:bxrise .5s .4s backwards}
+.sc.on .r1 .due{animation:bxd1 5s}.sc.on .r1 .paid{animation:bxp1 5s}
+@keyframes bxd1{0%,26%{opacity:1}30%,100%{opacity:0}}
+@keyframes bxp1{0%,26%{opacity:0}30%,100%{opacity:1}}
+.sc.on .r2 .due{animation:bxd2 5s}.sc.on .r2 .paid{animation:bxp2 5s}
+@keyframes bxd2{0%,54%{opacity:1}58%,100%{opacity:0}}
+@keyframes bxp2{0%,54%{opacity:0}58%,100%{opacity:1}}
+/* 3 fixed deposit */
+.fd{display:grid;justify-items:center;gap:14px;width:100%;max-width:320px}
+.fd-amt{text-align:center}.fd-amt small{display:block;font-size:.75rem;color:rgba(255,255,255,.55)}
+.fd-amt b{font-size:2.3rem;font-weight:900;color:var(--sky);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.bars{display:flex;align-items:flex-end;justify-content:center;gap:14px;height:150px;width:100%}
+.bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;font-size:.75rem;color:rgba(255,255,255,.6)}
+.bar i{display:block;width:44px;height:var(--h);border-radius:10px 10px 4px 4px;background:rgba(212,162,76,.35)}
+.bar:last-child i{background:linear-gradient(180deg,#f3d9a0,var(--sky) 50%,#b8832e);box-shadow:0 0 22px rgba(212,162,76,.5)}
+.fd-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.fd-badge{font-weight:700;font-size:.85rem;color:#0a0a0a;background:linear-gradient(135deg,#f3d9a0,var(--sky) 50%,#b8832e);border-radius:99px;padding:4px 14px}
+.fd-gain{font-size:.85rem;color:var(--ok);font-weight:700}
+.sc.on .bar i{animation:bxgrow .8s var(--ease) backwards}
+.sc.on .bar:nth-child(1) i{animation-delay:.3s}.sc.on .bar:nth-child(2) i{animation-delay:.5s}.sc.on .bar:nth-child(3) i{animation-delay:.7s}.sc.on .bar:nth-child(4) i{animation-delay:.9s}
+@keyframes bxgrow{from{height:0}}
+.sc.on .fd-badge{animation:bxpop .4s 1.8s backwards}
+.sc.on .fd-gain{animation:bxrise .6s 2.3s backwards}
+/* 4 protected sign-in */
+.sec{display:grid;justify-items:center;gap:16px}
+.pw,.pin{display:flex;gap:10px}
+.pw i{width:12px;height:12px;border-radius:50%;background:var(--sky)}
+.pin i{width:16px;height:16px;border-radius:50%;background:var(--sky)}
+.otp2{display:flex;gap:8px}
+.otp2 b{width:36px;height:44px;border-radius:10px;border:1.5px solid var(--sky);display:grid;place-items:center;color:#fff;font-weight:700}
+.sc.on .pw i{animation:bxdot .25s backwards;animation-delay:calc(.3s + var(--k)*.12s)}
+.sc.on .otp2 b{animation:bxpop .35s backwards;animation-delay:calc(1.5s + var(--k)*.15s)}
+.sc.on .pin i{animation:bxdot .25s backwards;animation-delay:calc(2.6s + var(--k)*.15s)}
+@keyframes bxdot{from{background:transparent;transform:scale(.5)}}
+.shield .sh{fill:rgba(212,162,76,.15);stroke:var(--sky);stroke-width:3}
+.shield .lock rect{fill:var(--sky)}
+.shield .shackle{fill:none;stroke:var(--sky);stroke-width:3.5;stroke-linecap:round}
+.sc.on .shield{animation:bxrise .6s 3s backwards}
+.sc.on .shackle{animation:bxlock .5s 3.5s backwards}
+@keyframes bxlock{from{transform:translateY(-7px)}}
+.sc.on .shield .sh{animation:bxglow 1.4s 4s}
+@keyframes bxglow{50%{filter:drop-shadow(0 0 16px rgba(212,162,76,.9))}}
+@media(max-width:560px){.tv,.beam{display:none}.big{padding:22px 18px 18px}}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;pointer-events:none;z-index:1}
+.hero::before{width:900px;height:900px;right:-340px;bottom:-560px;border:3px solid transparent;border-top-color:rgba(243,217,160,.7);border-right-color:rgba(212,162,76,.25);transform:rotate(-18deg);filter:drop-shadow(0 0 18px rgba(212,162,76,.35))}
+.hero::after{width:620px;height:620px;left:-260px;top:-360px;border:2px solid transparent;border-bottom-color:rgba(212,162,76,.5);transform:rotate(12deg)}
+@media(max-width:520px){.fc2{display:none}.fc1{right:0}}
+@media(max-width:900px){
+  nav ul{display:none}
+  .hero .wrap,.feat,.calc,.lite-grid{grid-template-columns:1fr}.hero .wrap{min-height:0}
+  .how-grid{grid-template-columns:1fr}.sticky{display:none}.stp{min-height:0;opacity:1;padding:18px 0 18px 24px}
+  .facts,.fgrid{grid-template-columns:1fr 1fr}.sent{left:auto;right:0}
+}
+@media(max-width:520px){
+  .nav.wrap{padding:0 16px}
+  .nav{gap:8px}
+  .nav .brand{font-size:clamp(1.1rem,6vw,1.4rem)}
+  .actions{flex-shrink:0;gap:6px}
+  .actions .btn{font-size:.875rem;padding:8px}
+  .facts,.fgrid{grid-template-columns:1fr}
+  .stores{flex-direction:column;width:100%}
+}
+@media(max-width:360px){
+  .nav.wrap{padding:0 12px}
+  .nav{gap:4px}
+  .nav .brand{font-size:1rem}
+  .actions{gap:4px}
+  .actions .btn{font-size:.75rem;padding:6px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .w>span,.fadeup,.js .rv{transform:none;opacity:1}
+  .fld i{width:var(--w)}.otp b,.dots i.f{opacity:1}.bank{transform:none}.ring circle,.ring path{stroke-dashoffset:0}
+}
+</style>
+<script>document.documentElement.classList.add("js","intro")</script>
 </head>
-
 <body>
-  <header class="main-header">
-    <div class="header-content">
-      <div class="logo">
-        <a href="index.html" class="paymoney-logo">
-          <svg class="logo-icon-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#0080ff" />
-                <stop offset="100%" stop-color="#00bfff" />
-              </linearGradient>
-            </defs>
-            <g transform="rotate(-10 50 35)">
-              <rect class="card-body" x="25" y="15" width="48" height="30" rx="3" />
-              <rect class="card-stripe" x="25" y="20" width="48" height="6" />
-              <rect class="card-chip" x="30" y="32" width="7" height="5" rx="1" />
-              <circle cx="62" cy="34.5" r="2.5" fill="#ffffff" opacity="0.6" />
-              <circle cx="66" cy="34.5" r="2.5" fill="#00bfff" opacity="0.6" />
-            </g>
-            <rect class="cuff" x="10" y="32" width="10" height="24" rx="2" />
-            <circle class="cuff-button" cx="15" cy="44" r="2" />
-            <path class="hand"
-              d="M 20,38 H 32 C 36,38 38,40 40,43 L 44,48 C 46,50 49,50 51,48 L 68,38 C 71,36 74,38 74,41 C 74,44 71,46 67,48 L 48,56 C 45,57 41,57 38,56 L 20,50 Z" />
-            <path class="hand" d="M 32,38 C 30,34 30,28 33,26 C 36,24 39,27 38,31 L 37,38" />
-          </svg>
-          <span class="logo-text-css">
-            <span class="pay-part">PAY</span><span class="money-part">MONEY</span>
-          </span>
-        </a>
+<div id="intro" aria-hidden="true"><div class="bgc"></div><div class="pulse"></div>
+  <div class="brand il"><span>PAY<b>MONEY</b></span></div></div>
+<div id="bar"></div>
+<header id="hd">
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="PayMoney home"><span>PAY<b>MONEY</b></span></a>
+    <nav aria-label="Main"><ul>
+      <li><a href="#features">Features</a></li><li><a href="#lite">PayMoney Lite</a></li><li><a href="#download">Download</a></li><li><a href="#about">About Us</a></li>
+    </ul></nav>
+    <div class="actions"><a class="btn btn-line" href="login.html">Login</a><a class="btn btn-fill" href="register.html">Register</a></div>
+  </div>
+</header>
+
+<main>
+<section class="hero" style="padding:0">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="spot"></span>
+  <div class="wrap">
+    <div>
+      <h1>Money moves the moment you do.</h1>
+      <p class="fadeup">Send money to a phone number or @paymoney ID, scan to pay, recharge your mobile and clear your bills, all from one wallet.</p>
+      <div class="cta fadeup" style="--d:.15s">
+        <a class="btn btn-fill btn-lg" href="register.html">Get started</a>
+        <a class="btn btn-line btn-lg" href="#features">Learn more</a>
       </div>
+      <p class="note fadeup" style="--d:.3s">New accounts start with ₹20,000 in the wallet.</p>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="float"><div class="phone"><div class="screen">
+        <div class="top"><span>Hi, Ayush</span><span>@paymoney</span></div>
+        <div class="bal"><small>Wallet balance</small><strong id="bal">₹0.00</strong><span>ayush@paymoney</span></div>
+        <div class="quick"><div><i></i>Send</div><div><i></i>Recharge</div><div><i></i>Bills</div><div><i></i>Scan</div></div>
+        <div id="feed"></div>
+      </div></div></div>
+      <div class="sent" id="sent"><div class="tick">✓</div><div><b id="st1"></b><span id="st2"></span></div></div>
+      <div class="fchip fc1">🔒 UPI PIN secured</div><div class="fchip fc2">⚡ Instant transfer</div>
+    </div>
+  </div>
+</section>
 
-      
+<div class="mq" aria-label="Supported operators"><div class="track" id="track"></div><div class="track rev" id="track2"></div></div>
 
-      <div class="auth-buttons">
-        <a href="login.html" class="btn btn-outline">Login</a>
-        <a href="register.html" class="btn btn-primary">Register</a>
+<section id="features">
+  <div class="wrap">
+    <h2 class="rv">Everything you pay for, in one place</h2>
+    <p class="lead rv" style="--i:1">Move money between people, keep utilities on, and put savings to work.</p>
+    <div class="feat">
+      <div class="big rv">
+        <div class="stg" aria-hidden="true">
+          <div class="sc on">
+            <div class="rch">
+              <div class="ph">
+                <div class="ph-sig"><i></i><i></i><i></i><i></i></div>
+                <div class="ph-num"><span class="pre">+91</span> <span class="num">98765 43210</span></div>
+                <div class="ph-op"><i></i>Jio · Prepaid</div>
+                <div class="ph-plan"><b>₹299</b><span>28 days · 2 GB/day</span></div>
+                <div class="ph-btn"><span class="b1">Recharge ₹299</span><span class="b2">✓ Recharged</span></div>
+              </div>
+              <div class="beam"><i></i></div>
+              <div class="tv">
+                <div class="tv-scr"><b>Tata Play</b><div class="chs"><i></i><i></i><i></i><i></i></div></div>
+                <span class="tv-ok">✓ Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="sc">
+            <div class="bill">
+              <div class="ico2">
+                <svg class="bulb" viewBox="0 0 64 64" width="84" height="84"><g class="rays"><path d="M32 1v4M9 10l3 3M55 10l-3 3M2 30h4M58 30h4"/></g><path class="glass" d="M32 8a17 17 0 0 0-9 31c2 1.5 3 3.5 3 6v3h12v-3c0-2.5 1-4.5 3-6A17 17 0 0 0 32 8z"/><rect class="base" x="26" y="50" width="12" height="3" rx="1.5"/><rect class="base" x="28" y="55" width="8" height="3" rx="1.5"/></svg>
+                <svg class="wifi" viewBox="0 0 64 64" width="84" height="84"><path class="w3" d="M6 24a37 37 0 0 1 52 0"/><path class="w2" d="M15 33a24 24 0 0 1 34 0"/><path class="w1" d="M24 42a11 11 0 0 1 16 0"/><circle cx="32" cy="51" r="3.5"/></svg>
+              </div>
+              <div class="bl r1"><span>Electricity</span><b>₹1,240</b><em class="st"><span class="due">Due</span><span class="paid">✓ Paid</span></em></div>
+              <div class="bl r2"><span>Broadband</span><b>₹799</b><em class="st"><span class="due">Due</span><span class="paid">✓ Paid</span></em></div>
+            </div>
+          </div>
+          <div class="sc">
+            <div class="fd">
+              <div class="fd-amt"><small>You get at maturity</small><b id="fdv">₹28,440</b></div>
+              <div class="bars">
+                <div class="bar"><i style="--h:40px"></i><span>3m</span></div>
+                <div class="bar"><i style="--h:62px"></i><span>6m</span></div>
+                <div class="bar"><i style="--h:88px"></i><span>12m</span></div>
+                <div class="bar"><i style="--h:118px"></i><span>24m</span></div>
+              </div>
+              <div class="fd-row"><span class="fd-badge">6.5% p.a.</span><span class="fd-gain">+₹3,440 interest</span></div>
+            </div>
+          </div>
+          <div class="sc">
+            <div class="sec">
+              <div class="pw"><i style="--k:0"></i><i style="--k:1"></i><i style="--k:2"></i><i style="--k:3"></i><i style="--k:4"></i><i style="--k:5"></i><i style="--k:6"></i><i style="--k:7"></i></div>
+              <div class="otp2"><b style="--k:0">4</b><b style="--k:1">8</b><b style="--k:2">1</b><b style="--k:3">9</b><b style="--k:4">2</b><b style="--k:5">6</b></div>
+              <div class="pin"><i style="--k:0"></i><i style="--k:1"></i><i style="--k:2"></i><i style="--k:3"></i></div>
+              <svg class="shield" viewBox="0 0 64 72" width="92" height="104"><path class="sh" d="M32 4 6 14v20c0 17 11 29 26 34 15-5 26-17 26-34V14L32 4z"/><g class="lock"><rect x="22" y="32" width="20" height="16" rx="3"/><path class="shackle" d="M26 32v-5a6 6 0 0 1 12 0v5"/></g></svg>
+            </div>
+          </div>
+        </div>
+        <div class="nav2"><button class="on" aria-label="Mobile and DTH recharge"></button><button aria-label="Electricity and broadband bills"></button><button aria-label="Fixed deposits"></button><button aria-label="Protected sign-in"></button></div>
       </div>
-
-      
-        <div class="bar"></div>
-        <div class="bar"></div>
+      <div class="list">
+        <div class="row rv" style="--i:1"><div class="ico" style="background:#fff3e0;color:#e08a00">₹</div><div><h3>Mobile and DTH recharge</h3><p>Jio, Airtel, Vi and BSNL, plus Tata Play, Dish TV and more. Operators are detected from your number.</p></div></div>
+        <div class="row rv" style="--i:2"><div class="ico" style="background:#e5f7ee;color:var(--ok)">⚡</div><div><h3>Electricity and broadband bills</h3><p>Pick your state board or ISP, check the amount due and pay.</p></div></div>
+        <div class="row rv" style="--i:3"><div class="ico" style="background:var(--sky-soft);color:var(--sky)">%</div><div><h3>Fixed deposits up to 6.5% p.a.</h3><p>Start from ₹500 for 3 to 24 months, and break the deposit any time to get your principal back.</p></div></div>
+        <div class="row rv" style="--i:4"><div class="ico" style="background:#f6e6c6;color:#b8832e">🔒</div><div><h3>Protected sign-in</h3><p>Password plus an email code at every login, and a PIN before any money leaves your wallet.</p></div></div>
       </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  
+<section class="how">
+  <div class="wrap how-grid">
+    <div>
+      <h2 class="rv">Up and running in three steps</h2>
+      <div class="stp on" data-s="0"><h3><span class="sn">1</span>Create your account</h3><p>Enter your name, email and phone number, then confirm the code we email you.</p></div>
+      <div class="stp" data-s="1"><h3><span class="sn">2</span>Link a bank and set a PIN</h3><p>Add your bank account and choose your UPI ID and 4-digit PIN.</p></div>
+      <div class="stp" data-s="2"><h3><span class="sn">3</span>Pay, recharge, save</h3><p>Send money, clear bills and open a fixed deposit from your dashboard.</p></div>
+    </div>
+    <div class="sticky" aria-hidden="true"><div class="phone"><div class="screen">
+      <div class="scr on"><h4>Create account</h4>
+        <div class="fld"><i style="--w:70%;--k:0"></i></div><div class="fld"><i style="--w:85%;--k:1"></i></div><div class="fld"><i style="--w:55%;--k:2"></i></div>
+        <div class="otp"><b style="--k:0">4</b><b style="--k:1">8</b><b style="--k:2">1</b><b style="--k:3">9</b><b style="--k:4">2</b><b style="--k:5">6</b></div></div>
+      <div class="scr"><h4>Link bank, set PIN</h4>
+        <div class="bank"><i></i><div><b>HDFC Bank</b><br>XXXX1234</div></div>
+        <div class="dots"><i style="--k:0"></i><i style="--k:1"></i><i style="--k:2"></i><i style="--k:3"></i></div>
+        <p style="text-align:center;font-size:.85rem;color:var(--muted)">Choose a 4-digit UPI PIN</p></div>
+      <div class="scr"><div class="pay"><small style="color:var(--muted)">Paid to riya@paymoney</small><div class="amt">₹500</div>
+        <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" pathLength="1"/><path d="M30 52l14 14 27-30" pathLength="1"/></svg>
+        <b style="color:var(--ok)">Payment successful</b></div></div>
+    </div></div></div>
+  </div>
+</section>
 
-  <main>
-    <section class="hero">
-      <div class="hero-content">
-        <h1>India's Most Trusted Payment App</h1>
-        <p>Send money, pay bills, recharge mobile, and do more with PayMoney</p>
-        <div class="hero-buttons">
-          <a href="register.html" class="btn btn-primary">Get Started</a>
-          <a href="#features" class="btn btn-secondary">Learn More</a>
-        </div>
+<section>
+  <div class="wrap">
+    <h2 class="rv">See what your savings could earn</h2>
+    <div class="calc">
+      <div class="rv">
+        <div class="plans" id="plans"></div>
+        <div class="amt-l"><span>Deposit amount</span><b id="amtv"></b></div>
+        <input type="range" id="amt" min="500" max="100000" step="500" value="25000" aria-label="Deposit amount">
       </div>
-      <div class="hero-image">
-        <img src="https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=600"
-          alt="PayMoney App">
-      </div>
-    </section>
-
-    <section id="features" class="features">
-      <h2>Why Choose PayMoney</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon payments"></div>
-          <h3>Fast Payments</h3>
-          <p>Send money instantly to anyone, anywhere in India</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon bills"></div>
-          <h3>Bill Payments</h3>
-          <p>Pay electricity, water, gas, and other utility bills</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon recharge"></div>
-          <h3>Mobile Recharge</h3>
-          <p>Quick recharge for all mobile operators</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon security"></div>
-          <h3>Secure Transactions</h3>
-          <p>Bank-grade security for all your transactions</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="download" class="download">
-      <div class="download-content">
-        <h2>Download Our App <span style="font-size: 0.5em; background: #007bff; color: white; padding: 4px 8px; border-radius: 12px; vertical-align: middle; margin-left: 10px;">Coming Soon</span></h2>
-        <p>Get the PayMoney app on your phone for a better experience. We're launching soon!</p>
-        <div class="store-buttons" style="opacity: 0.6; pointer-events: none; filter: grayscale(100%);">
-          <a href="#" class="store-button google-play">
-            <span>GET IT ON</span>
-            <strong>Google Play</strong>
-          </a>
-          <a href="#" class="store-button app-store">
-            <span>Download on the</span>
-            <strong>App Store</strong>
-          </a>
-        </div>
-      </div>
-      <div class="download-image">
-        <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=600"
-          alt="PayMoney App Download">
-      </div>
-    </section>
-
-    <section id="about" class="about">
-      <h2>About PayMoney</h2>
-      <p>PayMoney is India's leading digital payment platform, trusted by millions of users for daily transactions. Our
-        mission is to make digital payments accessible to everyone in India.</p>
-      <div class="stats">
-        <div class="stat-item">
-          <h3>100M+</h3>
-          <p>Users</p>
-        </div>
-        <div class="stat-item">
-          <h3>5B+</h3>
-          <p>Transactions</p>
-        </div>
-        <div class="stat-item">
-          <h3>99.9%</h3>
-          <p>Uptime</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="main-footer">
-    <div class="footer-content">
-      <div class="footer-logo">
-        <h2>PAY<span>MONEY</span></h2>
-        <p>Making payments simple</p>
-      </div>
-
-      <div class="footer-links">
-        <div class="link-group">
-          <h3>Company</h3>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Press</a></li>
-          </ul>
-        </div>
-
-        <div class="link-group">
-          <h3>Products</h3>
-          <ul>
-            <li><a href="#">Payments</a></li>
-            <li><a href="#">Banking</a></li>
-            <li><a href="#">Investments</a></li>
-            <li><a href="#">Insurance</a></li>
-          </ul>
-        </div>
-
-        <div class="link-group">
-          <h3>Help & Support</h3>
-          <ul>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Security</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-          </ul>
-        </div>
+      <div class="result rv" style="--i:1">
+        <small>You get at maturity</small><strong id="mat"></strong>
+        <div class="split"><i class="p" id="sp"></i><i class="g" id="sg"></i></div>
+        <div class="legend"><span>Your deposit</span><span id="int"></span></div>
+        <p style="font-size:.8rem;opacity:.7;margin-top:14px">Estimate with quarterly compounding. Actual payout may differ.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="footer-bottom">
-      <p>&copy; 2025 PayMoney. All rights reserved.</p>
-      <div class="social-links">
-        <a href="#" class="social-icon facebook"></a>
-        <a href="#" class="social-icon twitter"></a>
-        <a href="#" class="social-icon instagram"></a>
-        <a href="#" class="social-icon linkedin"></a>
+<section class="lite" id="lite">
+  <div class="wrap lite-grid">
+    <div>
+      <h2 class="rv">PayMoney Lite: an account for your child, run by you</h2>
+      <p class="lead rv" style="--i:1">Open a Lite account for your child from your own PayMoney account, and see what they spend.</p>
+      <div class="row rv" style="--i:2"><div class="ico" style="background:var(--sky-soft);color:var(--sky)">+</div><div><h3>You open it</h3><p>Create your child's Lite account yourself. No separate sign-up for them.</p></div></div>
+      <div class="row rv" style="--i:3"><div class="ico" style="background:#f6e6c6;color:#b8832e">⇄</div><div><h3>Linked to your account</h3><p>The Lite account stays directly connected to yours.</p></div></div>
+      <div class="row rv" style="--i:4"><div class="ico" style="background:#e5f7ee;color:var(--ok)">◉</div><div><h3>See what they spend</h3><p>Follow your child's spending from your own account.</p></div></div>
+      <a class="btn btn-fill btn-lg rv" style="--i:5" href="register.html">Open a Lite account</a>
+    </div>
+    <div class="lk lite-vis rv" style="--i:2" aria-hidden="true">
+      <div class="acc par"><div class="who"><div class="av">P</div><div><b>Parent account</b><small>you@paymoney</small></div><span class="pill">Owner</span></div></div>
+      <div class="link"><span>Linked</span></div>
+      <div class="acc">
+        <div class="who"><div class="av" style="background:#ffb84d">A</div><div><b>Aarav</b><small style="color:var(--muted)">PayMoney Lite</small></div></div>
+        <div class="spent"><span>Spent today</span><strong data-count="259" data-pre="₹">₹0</strong></div>
+        <ul>
+          <li style="--k:0"><span>Canteen</span><em class="out" style="font-style:normal">−₹40</em></li>
+          <li style="--k:1"><span>Stationery</span><em class="out" style="font-style:normal">−₹120</em></li>
+          <li style="--k:2"><span>Game top-up</span><em class="out" style="font-style:normal">−₹99</em></li>
+        </ul>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabaseClient.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/main.js"></script>
+<section id="about" style="padding-top:0">
+  <div class="wrap">
+    <h2 class="rv">About PayMoney</h2>
+    <p class="lead rv" style="--i:1">PayMoney is built to make everyday digital payments simple for everyone in India: one wallet, one UPI ID, and no fees on transfers between users.</p>
+    <div class="facts">
+      <div class="rv"><strong data-count="20000" data-pre="₹">0</strong><span>Welcome balance</span></div>
+      <div class="rv" style="--i:1"><strong data-count="4">0</strong><span>Bill and recharge types</span></div>
+      <div class="rv" style="--i:2"><strong data-count="6.5" data-dec="1" data-suf="%">0</strong><span>Top fixed deposit rate</span></div>
+      <div class="rv" style="--i:3"><strong data-count="8" data-suf="-digit">0</strong><span>Email code at every login</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="dl" id="download">
+  <div class="wrap">
+    <div class="rv"><h2>Get the PayMoney app<span class="soon">Coming soon</span></h2>
+    <p class="lead">The mobile app is on its way. Until then, PayMoney works in any phone browser.</p></div>
+    <div class="stores rv" style="--i:1" aria-label="App stores, coming soon">
+      <div class="store"><small>Get it on</small><b>Google Play</b></div><div class="store"><small>Download on the</small><b>App Store</b></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><a class="brand" href="index.html"><span>PAY<b>MONEY</b></span></a><p style="margin-top:12px">Making payments simple.</p></div>
+      <div><h4>Company</h4><ul><li><a href="#about">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li></ul></div>
+      <div><h4>Products</h4><ul><li><a href="upi.html">Payments</a></li><li><a href="recharge.html">Recharge</a></li><li><a href="fd.html">Investments</a></li></ul></div>
+      <div><h4>Help and support</h4><ul><li><a href="support.html">FAQs</a></li><li><a href="support.html">Contact us</a></li><li><a href="#">Privacy policy</a></li></ul></div>
+    </div>
+    <p class="copy">© 2026 PayMoney. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const inr=n=>'₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const inr0=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function tween(el,to,fmt,from=0,dur=1300){
+  if(RM){el.textContent=fmt(to);return}
+  const t0=performance.now();(function f(t){const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+  el.textContent=fmt(from+(to-from)*e);if(p<1)requestAnimationFrame(f)})(t0);
+}
+
+/* scroll progress + header shadow */
+const bar=$('#bar'),hd=$('#hd');
+addEventListener('scroll',()=>{
+  bar.style.transform=`scaleX(${scrollY/Math.max(1,document.body.scrollHeight-innerHeight)})`;
+  hd.classList.toggle('scrolled',scrollY>10);
+  const y=Math.min(scrollY,800);hero.style.setProperty('--py',-y*.1+'px');hero.style.setProperty('--bp',y*.25+'px');
+},{passive:true});
+
+/* headline word reveal */
+const h=$('.hero h1');
+h.innerHTML=h.textContent.split(' ').map((w,i)=>`<span class="w"><span style="--i:${i}${i>=3?';color:var(--sky)':''}">${w}</span></span>`).join(' ');
+
+/* marquee */
+const ops=['Jio','Airtel','Vi','BSNL','Tata Play','Dish TV','Airtel Digital TV','Sun Direct','JioFiber','ACT Fibernet','Hathway','Electricity boards'];
+$('#track').innerHTML=[...ops,...ops].map(o=>`<span>${o}</span>`).join('');
+const ops2=['Send money','Scan and pay','Recharge','Electricity','Broadband','DTH','Fixed deposits','PayMoney Lite','UPI PIN','QR codes','Receipts'];
+$('#track2').innerHTML=[...ops2,...ops2].map(o=>`<span>${o}</span>`).join('');
+
+/* hero: live wallet */
+let bal=18450;const balEl=$('#bal'),feed=$('#feed'),sent=$('#sent');
+function startHero(){
+  tween(balEl,bal,inr,0,1600);
+  if(!RM)setTimeout(()=>{add();setInterval(()=>visible&&add(),3400)},1800);
+}
+const evs=[['Riya Sharma',-500,'₹500 sent','to riya@paymoney'],['Jio recharge',-299,'Recharge done','₹299 plan, 28 days'],['Cashback',50,'₹50 cashback','added to wallet'],['Electricity bill',-1240,'Bill paid','₹1,240 to state board'],['Arjun Mehta',650,'₹650 received','from arjun@paymoney']];
+let k=0,visible=true;
+function add(){
+  const [n,a,t1,t2]=evs[k++%evs.length];
+  const d=document.createElement('div');d.className='tx';
+  d.innerHTML=`<span>${n}</span><em class="${a<0?'out':'in'}">${a<0?'−':'+'}₹${Math.abs(a).toLocaleString('en-IN')}</em>`;
+  feed.prepend(d);while(feed.children.length>3)feed.lastChild.remove();
+  const from=bal;bal+=a;tween(balEl,bal,inr,from,700);
+  $('#st1').textContent=t1;$('#st2').textContent=t2;
+  sent.classList.remove('show');void sent.offsetWidth;sent.classList.add('show');
+}
+if(!RM){
+  new IntersectionObserver(e=>visible=e[0].isIntersecting).observe($('.stage'));
+}else{evs.slice(0,3).forEach(()=>add());sent.style.display='none'}
+
+/* phone tilt */
+const stage=$('.stage'),ph=$('.stage .phone');
+if(!RM&&matchMedia('(hover:hover)').matches){
+  stage.addEventListener('mousemove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ph.style.transform=`rotateY(${x*16}deg) rotateX(${-y*12}deg)`});
+  stage.addEventListener('mouseleave',()=>ph.style.transform='');
+}
+
+/* reveals + counters */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;io.unobserve(e.target);e.target.classList.add('in');
+  const c=e.target.querySelector('[data-count]');
+  if(c){const d=+c.dataset.dec||0,p=c.dataset.pre||'',s=c.dataset.suf||'';
+    tween(c,+c.dataset.count,v=>p+v.toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d})+s,0,1600)}
+}),{threshold:.2});
+$$('.fgrid>div,.copy').forEach((d,i)=>{d.classList.add('rv');d.style.setProperty('--i',i)});
+$$('.rv').forEach(el=>io.observe(el));
+
+/* sticky steps */
+const stps=$$('.stp'),scrs=$$('.scr');let cur=0;
+function burst(){if(RM)return;const sc=$('.sticky .screen');
+  for(let n=0;n<24;n++){const c=document.createElement('i');c.className='conf';
+    c.style.cssText=`background:${['#d4a24c','#1fa971','#ffb84d','#b8832e','#ff6b6b'][n%5]};--dx:${(Math.random()-.5)*280}px;--dy:${-70-Math.random()*220}px;--r:${Math.random()*720}deg`;
+    sc.appendChild(c);setTimeout(()=>c.remove(),1300)}}
+const so=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;const i=+e.target.dataset.s;
+  stps.forEach((s,j)=>s.classList.toggle('on',j===i));
+  scrs.forEach((s,j)=>s.classList.toggle('on',j===i));
+  if(i===2&&cur!==2)setTimeout(burst,1100);cur=i;
+}),{rootMargin:'-45% 0px -45% 0px'});
+stps.forEach(s=>so.observe(s));
+
+/* FD calculator */
+const plans=[[3,5],[6,5.5],[12,6],[24,6.5]];let pi=2;
+const pl=$('#plans'),amt=$('#amt');
+pl.innerHTML=plans.map((p,i)=>`<button type="button" data-i="${i}">${p[0]} months · ${p[1]}%</button>`).join('');
+let last=0;
+function calc(){
+  const P=+amt.value,[m,r]=plans[pi],A=P*Math.pow(1+r/400,4*m/12),g=A-P;
+  $$('button',pl).forEach((b,i)=>b.classList.toggle('on',i===pi));
+  $('#amtv').textContent=inr0(P);
+  tween($('#mat'),A,inr0,last,500);last=A;
+  $('#sp').style.width=(P/A*100)+'%';$('#sg').style.width=(g/A*100)+'%';
+  $('#int').textContent='Interest '+inr0(g);
+  const rs=$('.result');rs.classList.remove('bump');void rs.offsetWidth;rs.classList.add('bump');
+}
+pl.addEventListener('click',e=>{const b=e.target.closest('button');if(b){pi=+b.dataset.i;calc()}});
+amt.addEventListener('input',calc);calc();
+
+/* extra motion: coins, glow, tilt, magnetic buttons */
+const hero=$('.hero');
+if(!RM)for(let n=0;n<16;n++){const c=document.createElement('span');c.className='coin';c.textContent='₹';
+  c.style.cssText=`left:${Math.random()*100}%;font-size:${14+Math.random()*26}px;animation-duration:${9+Math.random()*9}s;animation-delay:${-Math.random()*14}s`;hero.appendChild(c)}
+$$('.hero,.big,.result').forEach(el=>el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();
+  el.style.setProperty('--mx',e.clientX-r.left+'px');el.style.setProperty('--my',e.clientY-r.top+'px')}));
+if(!RM&&matchMedia('(hover:hover)').matches){
+  $$('.acc,.sticky .phone').forEach(el=>{el.dataset.tilt=1;
+    el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      el.style.transform=`perspective(700px) rotateY(${x*12}deg) rotateX(${-y*10}deg)`});
+    el.addEventListener('pointerleave',()=>el.style.transform='')});
+  $$('.btn-lg').forEach(b=>{b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();
+    b.style.translate=`${(e.clientX-r.left-r.width/2)*.25}px ${(e.clientY-r.top-r.height/2)*.35}px`});
+    b.addEventListener('pointerleave',()=>b.style.translate='')});
+}
+
+/* feature box: rotating scenes, synced with the list on the right */
+(function(){
+  const big=$('.big'),scs=$$('.sc',big),dots=$$('.nav2 button',big),rows=$$('.list .row'),fdv=$('#fdv');
+  const dur=[5800,5200,5000,5600],fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  let cur=0,t=null,vis=false;
+  function go(i){
+    cur=i;clearTimeout(t);
+    scs.forEach((x,j)=>x.classList.toggle('on',j===i));
+    dots.forEach((x,j)=>x.classList.toggle('on',j===i));
+    rows.forEach((x,j)=>x.classList.toggle('act',j===i));
+    if(i===2)setTimeout(()=>cur===2&&tween(fdv,28440,fmt,25000,1800),500);
+    if(!RM&&vis)t=setTimeout(()=>go((i+1)%scs.length),dur[i]);
+  }
+  dots.forEach((d,i)=>d.addEventListener('click',()=>go(i)));
+  new IntersectionObserver(e=>{vis=e[0].isIntersecting;if(vis)go(cur);else clearTimeout(t)}).observe(big);
+  go(0);
+})();
+
+/* intro: centre pop, then fly to the header */
+(function(){
+  const root=document.documentElement,ov=$('#intro');let over=false;
+  const done=()=>{if(over)return;over=true;ov.remove();root.classList.remove('intro');root.classList.add('ready');startHero()};
+  if(RM||!ov.animate){done();return}
+  try{
+    history.scrollRestoration='manual';scrollTo(0,0);
+    const il=$('.il',ov),bgc=$('.bgc',ov),tgt=$('.nav .brand');
+    const w=il.offsetWidth,h=il.offsetHeight,vw=innerWidth,vh=innerHeight;
+    const S=Math.min(2.4,vw*.8/w);
+    const at=s=>`translate(${vw/2-w*s/2}px,${vh/2-h*s/2}px) scale(${s})`;
+    il.animate([
+      {transform:at(S*.3),opacity:0},
+      {transform:at(S*1.14),opacity:1,offset:.6},
+      {transform:at(S),opacity:1}
+    ],{duration:850,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'}).finished.then(()=>new Promise(r=>setTimeout(r,500))).then(()=>{
+      const r=tgt.getBoundingClientRect();
+      bgc.animate([{opacity:1},{opacity:0}],{duration:750,delay:200,fill:'forwards'});
+      root.classList.add('flying');
+      return il.animate([
+        {transform:at(S),color:'#fff'},
+        {transform:`translate(${r.left}px,${r.top}px) scale(1)`,color:'#0a0a0a'}
+      ],{duration:950,easing:'cubic-bezier(.7,0,.2,1)',fill:'forwards'}).finished;
+    }).then(done).catch(done);
+  }catch(e){done()}
+  setTimeout(done,7000);
+})();
+</script>
 </body>
-
 </html>

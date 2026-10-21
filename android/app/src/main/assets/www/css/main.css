@@ -1,39 +1,39 @@
 :root {
   /* Colors */
-  --primary-color: #00baf2;
-  --primary-dark: #0095cc;
-  --primary-light: #e6f7fc;
-  --secondary-color: #002970;
-  --secondary-dark: #001c4d;
-  --secondary-light: #e6ebf5;
+  --primary-color: #d4a24c;
+  --primary-dark: #765116;
+  --primary-light: #f6e6c6;
+  --secondary-color: #0a0a0a;
+  --secondary-dark: #171512;
+  --secondary-light: #30281b;
   
-  --accent-color: #ff5722;
-  --accent-dark: #e64a19;
-  --accent-light: #ffebe5;
+  --accent-color: #d4a24c;
+  --accent-dark: #b8832e;
+  --accent-light: #f6e6c6;
   
   --success-color: #4caf50;
   --success-dark: #388e3c;
   --success-light: #e8f5e9;
   
-  --warning-color: #ff9800;
-  --warning-dark: #f57c00;
-  --warning-light: #fff3e0;
+  --warning-color: #d4a24c;
+  --warning-dark: #765116;
+  --warning-light: #f6e6c6;
   
   --error-color: #f44336;
   --error-dark: #d32f2f;
   --error-light: #ffebee;
   
-  --text-dark: #212121;
-  --text-medium: #424242;
-  --text-light: #757575;
+  --text-dark: #1a1712;
+  --text-medium: #393329;
+  --text-light: #6f675a;
   --text-white: #ffffff;
   
-  --bg-light: #f5f7fa;
-  --bg-white: #ffffff;
-  --bg-grey: #f1f3f6;
+  --bg-light: #f8f1e4;
+  --bg-white: #fffaf1;
+  --bg-grey: #f6e6c6;
   
-  --border-color: #e0e0e0;
-  --border-dark: #bdbdbd;
+  --border-color: #e8dcc2;
+  --border-dark: #d4a24c;
   
   /* Spacing */
   --spacing-xs: 4px;
@@ -86,7 +86,7 @@ body {
   font-size: var(--font-size-md);
   color: var(--text-dark);
   background-color: var(--bg-light);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -100,7 +100,7 @@ p {
 }
 
 a {
-  color: var(--primary-color);
+  color: var(--primary-dark);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
@@ -141,31 +141,17 @@ img {
   outline: none;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.btn-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
 .btn-primary {
-  background-color: var(--primary-color);
-  color: var(--text-white);
+  background: linear-gradient(135deg, #f3d9a0, var(--primary-color) 55%, #b8832e);
+  color: var(--secondary-color);
+  font-weight: 700;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
-  color: var(--text-white);
+  background: linear-gradient(135deg, #f3d9a0, var(--primary-color) 55%, #b8832e);
+  color: var(--secondary-color);
+  filter: brightness(1.04);
+  box-shadow: 0 8px 18px rgba(184, 131, 46, .25);
 }
 
 .btn-secondary {
@@ -180,12 +166,13 @@ img {
 
 .btn-outline {
   background-color: transparent;
-  color: var(--primary-color);
+  color: var(--primary-dark);
   border: 1px solid var(--primary-color);
 }
 
 .btn-outline:hover {
   background-color: var(--primary-light);
+  color: var(--secondary-color);
 }
 
 .btn-icon {
@@ -203,8 +190,8 @@ img {
 
 /* Header */
 .main-header {
-  background-color: var(--bg-white);
-  box-shadow: var(--shadow-sm);
+  background-color: rgba(255, 250, 241, .96);
+  box-shadow: 0 4px 18px rgba(10, 10, 10, .08);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -672,7 +659,7 @@ input::placeholder, select::placeholder, textarea::placeholder {
 }
 
 .upi-global-modal {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--border-radius-lg);
   width: 90%;
   max-width: 400px;
@@ -727,8 +714,8 @@ input::placeholder, select::placeholder, textarea::placeholder {
 }
 
 .upi-global-body input[readonly] {
-  background-color: #f5f5f5;
-  color: #666;
+  background-color: var(--bg-light);
+  color: var(--text-light);
   cursor: not-allowed;
 }
 
@@ -769,7 +756,7 @@ input::placeholder, select::placeholder, textarea::placeholder {
   height: 60px;
   border-radius: 50%;
   border: none;
-  background: #f0f0f0;
+  background: var(--bg-light);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -781,7 +768,7 @@ input::placeholder, select::placeholder, textarea::placeholder {
   transition: all 0.2s;
 }
 .pin-key:active {
-  background: #e0e0e0;
+  background: var(--primary-light);
   transform: scale(0.95);
 }
 .pin-key.empty {

@@ -17,6 +17,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
@@ -104,8 +105,13 @@ class MainActivity : AppCompatActivity() {
         settings.useWideViewPort = true
         settings.loadWithOverviewMode = true
 
-        // Ensure third-party cookies are accepted for session persistence
-        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+        // Ensure mixed content (CDN HTTPS assets on local file:// origin) is allowed
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+        // Ensure cookies are accepted for session persistence
+        val cookieManager = CookieManager.getInstance()
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(webView, true)
 
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -135,8 +141,12 @@ class MainActivity : AppCompatActivity() {
             ): Boolean {
                 val url = request?.url.toString()
                 
-                // Allow our domain to load inside WebView
-                if (url.startsWith("file:///") || url.startsWith("https://paymoney18.netlify.app") || url.startsWith("http://paymoney18.netlify.app")) {
+                // Allow our domain and local assets to load inside WebView
+                if (url.startsWith("file:///") || 
+                    url.startsWith("https://paymoney18.netlify.app") || 
+                    url.startsWith("http://paymoney18.netlify.app") ||
+                    url.startsWith("data:") ||
+                    url.startsWith("blob:")) {
                     return false
                 }
                 

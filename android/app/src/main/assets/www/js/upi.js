@@ -104,9 +104,37 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Pre-fill the recipient input field
     const recipientUpiIdInput = document.getElementById('recipientUpiId');
     if (recipientUpiIdInput) {
-      recipientUpiIdInput.value = decodeURIComponent(qrUpiId);
+      recipientUpiIdInput.value = qrUpiId;
       recipientUpiIdInput.readOnly = true;
     }
+
+    const qrAmount = urlParams.get('am');
+    const amountInput = document.getElementById('upiSendAmount');
+    if (amountInput && qrAmount && /^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(qrAmount) && Number(qrAmount) > 0) {
+      amountInput.value = qrAmount;
+    }
+
+    const qrNote = urlParams.get('tn');
+    const noteInput = document.getElementById('upiSendNote');
+    if (noteInput && qrNote) {
+      noteInput.value = qrNote;
+    }
+  }
+
+  // UPI ID Copy functionality
+  const copyUpiBtn = document.getElementById('copyUpiBtn');
+  if (copyUpiBtn) {
+    copyUpiBtn.addEventListener('click', () => {
+      const upiIdDisplay = document.getElementById('upiIdDisplay');
+      if (upiIdDisplay && upiIdDisplay.textContent) {
+        navigator.clipboard.writeText(upiIdDisplay.textContent).then(() => {
+          showNotification('UPI ID copied to clipboard');
+        }).catch(err => {
+          showNotification('Failed to copy UPI ID', 'error');
+          console.error('Clipboard error:', err);
+        });
+      }
+    });
   }
   
   // 3. Require authentication and load async data
@@ -204,14 +232,7 @@ async function loadUpiTransactions() {
     
     const typeClass = isCredit ? 'credit' : 'debit';
     
-    let otherPerson = null;
-    if (tx.transaction_type === 'add_money') {
-      otherPerson = user;
-    } else if (isCredit) {
-      otherPerson = tx.sender;
-    } else {
-      otherPerson = tx.receiver;
-    }
+    const otherPerson = isCredit ? tx.sender : tx.receiver;
     
     const avatarUrl = getAvatarUrl(otherPerson);
     
@@ -345,6 +366,13 @@ async function handleSendUpi(e) {
   
   if (!recipientUpiId) {
     showNotification('Please enter recipient info', 'error');
+    return;
+  }
+
+  const isPayMoneyUpiId = /@(paymoney|paymoneylite)$/i.test(recipientUpiId);
+  if ((recipientUpiId.includes('@') && !isPayMoneyUpiId) ||
+      (!recipientUpiId.includes('@') && !/^\d{10}$/.test(recipientUpiId))) {
+    showNotification('PayMoney can only send payments to PayMoney accounts.', 'error');
     return;
   }
   

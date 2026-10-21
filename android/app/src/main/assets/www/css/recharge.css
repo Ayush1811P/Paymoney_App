@@ -70,7 +70,7 @@
 
 .plan-tab.active {
   background-color: var(--primary-color);
-  color: var(--text-white);
+  color: var(--secondary-color);
 }
 
 .plans-list {
@@ -297,7 +297,7 @@
 .bill-details-card h4 {
   color: var(--secondary-color);
   margin-bottom: var(--spacing-md);
-  border-bottom: 1px solid rgba(0, 186, 242, 0.2);
+  border-bottom: 1px solid rgba(212, 162, 76, .25);
   padding-bottom: var(--spacing-xs);
   font-size: var(--font-size-md);
 }

@@ -4,9 +4,14 @@
 
 // OTP State
 let currentRegistrationData = null;
+let currentLiteRegistrationData = null;
 let currentLoginData = null;
 
 let otpTimerInterval = null;
+
+function redirectToAccountHome(accountType) {
+  window.location.replace(accountType === 'lite' ? 'lite-dashboard.html' : 'dashboard.html');
+}
 
 function startOtpTimer(btnId, displayId) {
   const btn = document.getElementById(btnId);
@@ -35,93 +40,53 @@ function startOtpTimer(btnId, displayId) {
   }, 1000);
 }
 
+// Call Supabase Auth to send OTP
 async function sendEmailOtp(email, type) {
-  try {
-    const { error } = await supabaseClient.auth.signInWithOtp({
-      email: email,
-    });
-    
-    if (error) {
-      if (error.message === 'Failed to fetch') {
-         console.warn('Network error during OTP, simulating success for development.');
-         return { message: 'OTP sent' };
-      }
-      throw new Error(error.message || 'Failed to send OTP');
-    }
-    return { message: 'OTP sent' };
-  } catch (e) {
-    if (e.message === 'Failed to fetch') {
-       console.warn('Network error during OTP, simulating success for development.');
-       return { message: 'OTP sent' };
-    }
-    throw e;
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email: email,
+  });
+  
+  if (error) {
+    throw new Error(error.message || 'Failed to send OTP');
   }
+  return { message: 'OTP sent' };
 }
 
 // Call Supabase Auth to verify OTP
 async function verifyEmailOtp(email, otp, type = 'Login', profileData = null) {
-  let finalToken = null;
-
-  try {
-    // 1. Verify the OTP with Supabase Auth
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-      email: email,
-      token: otp,
-      type: 'email'
-    });
-    
-    if (error) {
-      if (error.message === 'Failed to fetch') {
-        console.warn('Network error during verify OTP, simulating success.');
-        if (otp.length < 4) throw new Error('Invalid OTP');
-        finalToken = 'mock_token_for_local_dev';
-      } else {
-        throw new Error(error.message || 'Invalid OTP');
-      }
-    } else {
-      finalToken = data.session.access_token;
-    }
-  } catch (e) {
-    if (e.message === 'Failed to fetch') {
-      console.warn('Network error during verify OTP, simulating success.');
-      if (otp.length < 4) throw new Error('Invalid OTP');
-      finalToken = 'mock_token_for_local_dev';
-    } else {
-      throw e;
-    }
+  // 1. Verify the OTP with Supabase Auth
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email: email,
+    token: otp,
+    type: 'email'
+  });
+  
+  if (error) {
+    throw new Error(error.message || 'Invalid OTP');
   }
   
   // 2. If it's a Registration, securely insert the custom profile data via backend
   if (type === 'Registration' && profileData) {
-    try {
-      // We pass the session access token to prove to the backend we are verified
-      const response = await fetch('/.netlify/functions/complete-registration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          token: finalToken, 
-          profileData 
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create user profile via network');
-      }
-      
-      const result = await response.json();
-      return { profileId: result.profileId };
-    } catch (err) {
-      console.warn("Backend unavailable, using persistent mock profile creation");
-      const mockId = 'mock-' + profileData.phone;
-      profileData.id = mockId;
-      
-      const localUsers = JSON.parse(localStorage.getItem('mock_users_db') || '{}');
-      localUsers[profileData.phone] = profileData;
-      localStorage.setItem('mock_users_db', JSON.stringify(localUsers));
-      
-      localStorage.setItem(`mock_profile_${mockId}`, JSON.stringify(profileData));
-      return { profileId: mockId };
+    const apiOrigin = (window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null')
+      ? 'https://paymoney18.netlify.app'
+      : '';
+    // We pass the session access token to prove to the backend we are verified
+    const response = await fetch(`${apiOrigin}/.netlify/functions/complete-registration`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        token: data.session.access_token, 
+        profileData 
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create user profile');
     }
+    
+    const result = await response.json();
+    return { profileId: result.profileId };
   }
   
   // If Login, just return success
@@ -132,36 +97,76 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Redirect if already logged in
   if (await redirectIfLoggedIn()) return;
   
-  // Login form
+  // Login forms & tab logic
   const loginForm = document.getElementById('loginForm');
+  const liteLoginForm = document.getElementById('liteLoginForm');
+  const tabNormalLoginBtn = document.getElementById('tabNormalLoginBtn');
+  const tabLiteLoginBtn = document.getElementById('tabLiteLoginBtn');
+  const otpFormLogin = document.getElementById('otpFormLogin');
+
+  if (tabNormalLoginBtn && tabLiteLoginBtn) {
+    function activateNormalLogin() {
+      tabNormalLoginBtn.classList.add('active');
+      tabLiteLoginBtn.classList.remove('active');
+      if (loginForm) loginForm.style.display = 'block';
+      if (liteLoginForm) liteLoginForm.style.display = 'none';
+      if (otpFormLogin) otpFormLogin.style.display = 'none';
+      const footerLink = document.querySelector('.auth-footer a');
+      if (footerLink) footerLink.href = 'register.html';
+    }
+
+    function activateLiteLogin() {
+      tabLiteLoginBtn.classList.add('active');
+      tabNormalLoginBtn.classList.remove('active');
+      if (loginForm) loginForm.style.display = 'none';
+      if (liteLoginForm) liteLoginForm.style.display = 'block';
+      if (otpFormLogin) otpFormLogin.style.display = 'none';
+      const footerLink = document.querySelector('.auth-footer a');
+      if (footerLink) footerLink.href = 'register.html?tab=lite';
+    }
+
+    tabNormalLoginBtn.addEventListener('click', activateNormalLogin);
+    tabLiteLoginBtn.addEventListener('click', activateLiteLogin);
+
+    // Auto-switch to Lite tab if navigated with ?tab=lite
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'lite') {
+      activateLiteLogin();
+    }
+  }
+
   if (loginForm) {
     loginForm.addEventListener('submit', handleLogin);
-    
-    // Initialize password visibility toggles
-    const toggleButtons = document.querySelectorAll('.toggle-password-btn');
-    toggleButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const container = this.closest('.password-input-container');
-        if (!container) return;
-        
-        const input = container.querySelector('input');
-        const eyeOpen = this.querySelector('.eye-open');
-        const eyeClosed = this.querySelector('.eye-closed');
-        
-        if (input && eyeOpen && eyeClosed) {
-          if (input.type === 'password') {
-            input.type = 'text';
-            eyeOpen.style.display = 'none';
-            eyeClosed.style.display = 'block';
-          } else {
-            input.type = 'password';
-            eyeOpen.style.display = 'block';
-            eyeClosed.style.display = 'none';
-          }
-        }
-      });
-    });
   }
+
+  if (liteLoginForm) {
+    liteLoginForm.addEventListener('submit', handleLiteLogin);
+  }
+
+  // Initialize password visibility toggles across forms
+  const toggleButtons = document.querySelectorAll('.toggle-password-btn');
+  toggleButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const container = this.closest('.password-input-container');
+      if (!container) return;
+      
+      const input = container.querySelector('input');
+      const eyeOpen = this.querySelector('.eye-open');
+      const eyeClosed = this.querySelector('.eye-closed');
+      
+      if (input && eyeOpen && eyeClosed) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          eyeOpen.style.display = 'none';
+          eyeClosed.style.display = 'block';
+        } else {
+          input.type = 'password';
+          eyeOpen.style.display = 'block';
+          eyeClosed.style.display = 'none';
+        }
+      }
+    });
+  });
   
   // Register form
   const registerForm = document.getElementById('registerForm');
@@ -208,17 +213,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Terms modal logic
     const termsModal = document.getElementById('termsModal');
-    const viewTermsLink = document.getElementById('viewTermsLink');
     const closeTermsBtn = document.getElementById('closeTermsBtn');
     const acceptTermsBtn = document.getElementById('acceptTermsBtn');
-    const termsAgreeCheckbox = document.getElementById('termsAgree');
     
-    if (viewTermsLink && termsModal) {
-      viewTermsLink.addEventListener('click', function(e) {
+    document.querySelectorAll('.viewTermsLink, #viewTermsLink').forEach(link => {
+      link.addEventListener('click', function(e) {
         e.preventDefault();
-        termsModal.style.display = 'block';
+        if (termsModal) termsModal.style.display = 'block';
       });
-    }
+    });
     
     if (closeTermsBtn && termsModal) {
       closeTermsBtn.addEventListener('click', function() {
@@ -229,9 +232,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (acceptTermsBtn && termsModal) {
       acceptTermsBtn.addEventListener('click', function() {
         termsModal.style.display = 'none';
-        if (termsAgreeCheckbox) {
-          termsAgreeCheckbox.checked = true;
-        }
+        const termsAgreeCheckbox = document.getElementById('termsAgree');
+        const liteTermsAgreeCheckbox = document.getElementById('liteTermsAgree');
+        if (termsAgreeCheckbox) termsAgreeCheckbox.checked = true;
+        if (liteTermsAgreeCheckbox) liteTermsAgreeCheckbox.checked = true;
       });
     }
     
@@ -241,9 +245,93 @@ document.addEventListener('DOMContentLoaded', async function() {
         termsModal.style.display = 'none';
       }
     });
-    
-    // OTP Form Logic - Register
+
+    // Account Type Tabs logic (Normal vs Lite)
+    const tabNormalBtn = document.getElementById('tabNormalBtn');
+    const tabLiteBtn = document.getElementById('tabLiteBtn');
+    const liteRegisterForm = document.getElementById('liteRegisterForm');
+    const liteOtpForm = document.getElementById('liteOtpForm');
+    const liteSuccessCard = document.getElementById('liteSuccessCard');
     const otpForm = document.getElementById('otpForm');
+
+    if (tabNormalBtn && tabLiteBtn) {
+      function activateNormalRegister() {
+        tabNormalBtn.classList.add('active');
+        tabLiteBtn.classList.remove('active');
+        if (registerForm) registerForm.style.display = 'block';
+        if (liteRegisterForm) liteRegisterForm.style.display = 'none';
+        if (otpForm) otpForm.style.display = 'none';
+        if (liteOtpForm) liteOtpForm.style.display = 'none';
+        if (liteSuccessCard) liteSuccessCard.style.display = 'none';
+        const footerLink = document.querySelector('.auth-footer a');
+        if (footerLink) footerLink.href = 'login.html';
+      }
+
+      function activateLiteRegister() {
+        tabLiteBtn.classList.add('active');
+        tabNormalBtn.classList.remove('active');
+        if (registerForm) registerForm.style.display = 'none';
+        if (liteRegisterForm) liteRegisterForm.style.display = 'block';
+        if (otpForm) otpForm.style.display = 'none';
+        if (liteOtpForm) liteOtpForm.style.display = 'none';
+        if (liteSuccessCard) liteSuccessCard.style.display = 'none';
+        const footerLink = document.querySelector('.auth-footer a');
+        if (footerLink) footerLink.href = 'login.html?tab=lite';
+      }
+
+      tabNormalBtn.addEventListener('click', activateNormalRegister);
+      tabLiteBtn.addEventListener('click', activateLiteRegister);
+
+      // Auto-switch to Lite tab if navigated with ?tab=lite
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'lite') {
+        activateLiteRegister();
+      }
+    }
+
+    // Lite Registration form logic
+    if (liteRegisterForm) {
+      liteRegisterForm.addEventListener('submit', handleLiteRegister);
+
+      const toggleButtonsLite = liteRegisterForm.querySelectorAll('.toggle-password-btn');
+      toggleButtonsLite.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const container = this.closest('.password-input-container');
+          if (!container) return;
+          
+          const input = container.querySelector('input');
+          const eyeOpen = this.querySelector('.eye-open');
+          const eyeClosed = this.querySelector('.eye-closed');
+          
+          if (input && eyeOpen && eyeClosed) {
+            if (input.type === 'password') {
+              input.type = 'text';
+              eyeOpen.style.display = 'none';
+              eyeClosed.style.display = 'block';
+            } else {
+              input.type = 'password';
+              eyeOpen.style.display = 'block';
+              eyeClosed.style.display = 'none';
+            }
+          }
+        });
+      });
+
+      const litePassword = document.getElementById('litePassword');
+      const liteConfirmPassword = document.getElementById('liteConfirmPassword');
+      
+      if (litePassword && liteConfirmPassword) {
+        liteConfirmPassword.addEventListener('input', function() {
+          if (litePassword.value !== liteConfirmPassword.value) {
+            liteConfirmPassword.setCustomValidity('Passwords do not match');
+          } else {
+            liteConfirmPassword.setCustomValidity('');
+          }
+        });
+      }
+    }
+    
+    // OTP Form Logic - Normal Register
     const backToRegisterBtn = document.getElementById('backToRegisterBtn');
     
     if (otpForm && backToRegisterBtn) {
@@ -261,10 +349,8 @@ document.addEventListener('DOMContentLoaded', async function() {
           
           if (result.profileId) {
             localStorage.setItem('paymoney_user_id', result.profileId);
-            showNotification('Registration successful! Redirecting...');
-            setTimeout(() => {
-              window.location.href = 'dashboard.html';
-            }, 1500);
+            localStorage.setItem('paymoney_account_type', 'normal');
+            redirectToAccountHome('normal');
           } else {
             throw new Error('Failed to retrieve profile ID');
           }
@@ -290,10 +376,78 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
       }
     }
+
+    // OTP Form Logic - Lite Register (Parent Email OTP)
+    const backToLiteRegisterBtn = document.getElementById('backToLiteRegisterBtn');
+    if (liteOtpForm && backToLiteRegisterBtn) {
+      backToLiteRegisterBtn.addEventListener('click', () => {
+        liteOtpForm.style.display = 'none';
+        if (liteRegisterForm) liteRegisterForm.style.display = 'block';
+      });
+
+      liteOtpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const enteredOtp = document.getElementById('liteOtpInput').value.trim();
+        const verifyBtn = document.getElementById('verifyLiteRegisterBtn');
+        const originalText = verifyBtn ? verifyBtn.textContent : '';
+        if (verifyBtn) {
+          verifyBtn.disabled = true;
+          verifyBtn.textContent = 'Verifying...';
+        }
+
+        try {
+          const result = await verifyEmailOtp(currentLiteRegistrationData.parent_email, enteredOtp, 'Registration', currentLiteRegistrationData);
+          
+          // CRITICAL SECURITY: Immediately destroy parent's Supabase auth session from the child's browser
+          try {
+            await supabaseClient.auth.signOut();
+          } catch (e) {
+            console.warn('Parent sign-out cleanup:', e);
+          }
+          localStorage.removeItem('paymoney_user_id');
+          localStorage.removeItem('paymoney_account_type');
+
+          if (result.profileId) {
+            liteOtpForm.style.display = 'none';
+            if (liteSuccessCard) {
+              liteSuccessCard.style.display = 'block';
+              const successEmailEl = document.getElementById('successParentEmail');
+              if (successEmailEl) successEmailEl.textContent = currentLiteRegistrationData.parent_email;
+            }
+            showNotification('Lite Account created successfully!', 'success');
+          } else {
+            throw new Error('Failed to retrieve profile ID');
+          }
+        } catch (error) {
+          showNotification(error.message, 'error');
+        } finally {
+          if (verifyBtn) {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = originalText;
+          }
+        }
+      });
+
+      const resendLiteOtpBtn = document.getElementById('resendLiteOtpBtn');
+      if (resendLiteOtpBtn) {
+        resendLiteOtpBtn.addEventListener('click', async () => {
+          if (!currentLiteRegistrationData) return;
+          resendLiteOtpBtn.disabled = true;
+          resendLiteOtpBtn.textContent = 'Sending...';
+          try {
+            await sendEmailOtp(currentLiteRegistrationData.parent_email, 'Lite Registration');
+            showNotification('OTP resent to parent successfully', 'success');
+            startOtpTimer('resendLiteOtpBtn', 'liteOtpTimerDisplay');
+          } catch (error) {
+            showNotification(error.message, 'error');
+          }
+          resendLiteOtpBtn.textContent = 'Resend OTP';
+        });
+      }
+    }
   }
 
   // OTP Form Logic - Login
-  const otpFormLogin = document.getElementById('otpFormLogin');
   const backToLoginBtn = document.getElementById('backToLoginBtn');
   const loginFormRef = document.getElementById('loginForm');
   
@@ -316,10 +470,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       
       // OTP matched, complete login
       localStorage.setItem('paymoney_user_id', currentLoginData.id);
-      showNotification('Login successful! Redirecting...');
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 1500);
+      localStorage.setItem('paymoney_account_type', 'normal');
+      redirectToAccountHome('normal');
     });
     
     const resendBtnLogin = document.getElementById('resendOtpBtnLogin');
@@ -362,7 +514,6 @@ async function handleLogin(e) {
   const hashedPassword = await hashPassword(password);
   
   // Authenticate using database lookup
-  let activeUser = null;
   const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
@@ -370,63 +521,98 @@ async function handleLogin(e) {
     .single();
     
   if (error || !data) {
-    // Fallback to local mock users
-    const localUsers = JSON.parse(localStorage.getItem('mock_users_db') || '{}');
-    if (localUsers[loginId]) {
-      const user = localUsers[loginId];
-      if (user.password_hash === hashedPassword) {
-        activeUser = user;
-      } else {
-        showNotification('Invalid phone number or password', 'error');
-        return;
-      }
-    } else {
+    showNotification('Invalid phone number or password', 'error');
+    return;
+  }
+  
+  if (data.password_hash !== hashedPassword) {
+    showNotification('Invalid phone number or password', 'error');
+    return;
+  }
+
+  // Guard: Lite users must log in via Lite Login tab
+  if (data.account_type === 'lite') {
+    showNotification('This is a Lite account. Please switch to the Lite Login tab.', 'error');
+    return;
+  }
+  
+  if (!data.email) {
+    // If user has no email registered (legacy user), just log them in
+    localStorage.setItem('paymoney_user_id', data.id);
+    localStorage.setItem('paymoney_account_type', 'normal');
+    redirectToAccountHome('normal');
+    return;
+  }
+  
+  // Complete Login
+  localStorage.setItem('paymoney_user_id', data.id);
+  localStorage.setItem('paymoney_account_type', 'normal');
+  redirectToAccountHome('normal');
+}
+
+// Handle Lite login form submission
+async function handleLiteLogin(e) {
+  e.preventDefault();
+  
+  const phone = document.getElementById('liteLoginPhone').value.trim();
+  const password = document.getElementById('liteLoginPassword').value;
+  
+  if (!phone || !password) {
+    showNotification('Please enter all fields', 'error');
+    return;
+  }
+  
+  if (!validatePhone(phone)) {
+    showNotification('Please enter a valid 10-digit phone number', 'error');
+    return;
+  }
+  
+  const hashedPassword = await hashPassword(password);
+  
+  const btn = document.getElementById('liteLoginBtn');
+  const originalText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('phone', phone)
+      .single();
+      
+    if (error || !data) {
       showNotification('Invalid phone number or password', 'error');
       return;
     }
-  } else {
+    
     if (data.password_hash !== hashedPassword) {
       showNotification('Invalid phone number or password', 'error');
       return;
     }
-    activeUser = data;
+    
+    // Guard: Normal accounts should use the Normal Login tab
+    if (data.account_type === 'normal') {
+      showNotification('This is a Normal PayMoney account. Please use the Normal Login tab.', 'error');
+      return;
+    }
+    
+    // Set authenticated Lite session
+    localStorage.setItem('paymoney_user_id', data.id);
+    localStorage.setItem('paymoney_account_type', 'lite');
+    
+    redirectToAccountHome('lite');
+  } catch (err) {
+    console.error('Error during Lite login:', err);
+    showNotification('An unexpected error occurred. Please try again.', 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   }
-  
-  if (!activeUser.email) {
-    // If user has no email registered (legacy user), just log them in
-    localStorage.setItem('paymoney_user_id', activeUser.id);
-    showNotification('Login successful! Redirecting...');
-    setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 1500);
-    return;
-  }
-  
-  // Prepare for 2FA OTP
-  currentLoginData = activeUser;
-  
-  // Show loading/notification
-  const btn = document.getElementById('loginBtn');
-  const originalText = btn.textContent;
-  btn.innerHTML = '<span class="btn-spinner"></span> Please wait...';
-  btn.disabled = true;
-  
-  try {
-    await sendEmailOtp(activeUser.email, 'Login');
-  } catch (error) {
-    showNotification(error.message, 'error');
-    btn.textContent = originalText;
-    btn.disabled = false;
-    return;
-  }
-  
-  btn.textContent = originalText;
-  btn.disabled = false;
-  
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('otpFormLogin').style.display = 'block';
-  showNotification('An OTP has been sent to your registered email.', 'success');
-  startOtpTimer('resendOtpBtnLogin', 'otpTimerDisplayLogin');
 }
 
 // Handle register form submission
@@ -497,7 +683,7 @@ async function handleRegister(e) {
     
     const btn = document.getElementById('registerBtn');
     const originalText = btn.textContent;
-    btn.innerHTML = '<span class="btn-spinner"></span> Please wait...';
+    btn.textContent = 'Sending OTP...';
     btn.disabled = true;
     
     try {
@@ -520,5 +706,151 @@ async function handleRegister(e) {
   } catch (error) {
     alert("Caught Error: " + error.name + " - " + error.message);
     console.error(error);
+  }
+}
+
+// Handle Lite register form submission
+async function handleLiteRegister(e) {
+  e.preventDefault();
+  
+  try {
+    const fullName = document.getElementById('liteFullName').value.trim();
+    const phone = document.getElementById('litePhone').value.trim();
+    const age = document.getElementById('liteAge').value.trim();
+    const parentEmail = document.getElementById('liteParentEmail').value.trim().toLowerCase();
+    const password = document.getElementById('litePassword').value;
+    const confirmPassword = document.getElementById('liteConfirmPassword').value;
+    const termsAgree = document.getElementById('liteTermsAgree').checked;
+    
+    if (!fullName) {
+      showNotification('Please enter child full name', 'error');
+      return;
+    }
+
+    if (!phone) {
+      showNotification('Please enter mobile number', 'error');
+      return;
+    }
+    
+    if (!validatePhone(phone)) {
+      showNotification('Please enter a valid 10-digit mobile number', 'error');
+      return;
+    }
+
+    const ageNum = parseInt(age, 10);
+    if (!age || isNaN(ageNum) || ageNum < 5 || ageNum > 25) {
+      showNotification('Please enter a valid age between 5 and 25', 'error');
+      return;
+    }
+
+    if (!parentEmail || !validateEmail(parentEmail)) {
+      showNotification('Please enter a valid parent email address', 'error');
+      return;
+    }
+
+    if (!password) {
+      showNotification('Please create a password', 'error');
+      return;
+    }
+    
+    if (password.length <= 5) {
+      showNotification('Password must be greater than 5 digits', 'error');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      showNotification('Passwords do not match', 'error');
+      return;
+    }
+    
+    if (!termsAgree) {
+      showNotification('Please agree to the terms and conditions', 'error');
+      return;
+    }
+    
+    // 1. Check if child phone number is already registered
+    const { data: existingPhone } = await supabaseClient
+      .from('profiles')
+      .select('id, phone')
+      .eq('phone', phone)
+      .maybeSingle();
+      
+    if (existingPhone) {
+      showNotification('This phone number is already registered', 'error');
+      return;
+    }
+    
+    // 2. Parent Account Existence Check: Must exist in PayMoney profiles
+    const { data: parentProfile, error: parentError } = await supabaseClient
+      .from('profiles')
+      .select('id, full_name, email')
+      .ilike('email', parentEmail)
+      .maybeSingle();
+      
+    if (parentError || !parentProfile) {
+      showNotification('No PayMoney account was found with this email. Please enter the email address registered with the parent\'s PayMoney account.', 'error');
+      return;
+    }
+    
+    try {
+      const { data: parentDetails } = await supabaseClient
+        .from('profiles')
+        .select('account_type')
+        .eq('id', parentProfile.id)
+        .maybeSingle();
+        
+      if (parentDetails && parentDetails.account_type === 'lite') {
+        showNotification('A Lite account cannot be linked as a parent account.', 'error');
+        return;
+      }
+    } catch (_) {
+      // Default to normal if column does not yet exist
+    }
+    
+    // 3. Hash child's password
+    const hashedPassword = await hashPassword(password);
+    
+    // 4. Prepare Lite registration state
+    currentLiteRegistrationData = {
+      full_name: fullName,
+      phone: phone,
+      age: ageNum,
+      account_type: 'lite',
+      parent_id: parentProfile.id,
+      parent_email: parentEmail,
+      upi_id: phone + '@paymoneylite',
+      password_hash: hashedPassword,
+      wallet_balance: 20000.00
+    };
+    
+    // 5. Send OTP to Parent's registered email
+    const btn = document.getElementById('liteRegisterBtn');
+    const originalText = btn.textContent;
+    btn.textContent = 'Sending OTP to Parent...';
+    btn.disabled = true;
+    
+    try {
+      await sendEmailOtp(parentEmail, 'Lite Registration');
+    } catch (error) {
+      showNotification(error.message, 'error');
+      btn.textContent = originalText;
+      btn.disabled = false;
+      return;
+    }
+    
+    btn.textContent = originalText;
+    btn.disabled = false;
+    
+    // Switch to Lite OTP form
+    document.getElementById('liteRegisterForm').style.display = 'none';
+    document.getElementById('liteOtpForm').style.display = 'block';
+    const parentDisplay = document.getElementById('parentEmailDisplay');
+    if (parentDisplay) parentDisplay.textContent = parentEmail;
+    
+    showNotification('An OTP has been sent to the parent\'s registered email.', 'success');
+    startOtpTimer('resendLiteOtpBtn', 'liteOtpTimerDisplay');
+  } catch (error) {
+    console.error('Error in handleLiteRegister:', error);
+    showNotification('An unexpected error occurred. Please try again.', 'error');
   }
 }

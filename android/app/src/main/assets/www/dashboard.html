@@ -40,6 +40,7 @@
       </div>
       
       <div class="user-menu">
+        <a href="family-dashboard.html" class="btn btn-outline" id="familyAccountsBtn" style="margin-right: 15px; background-color: var(--primary-light); border-color: var(--primary-color); color: var(--primary-dark); font-weight: 500;">👪 Lite Accounts</a>
         <a href="profile.html" class="user-profile">
           <img id="userAvatar" src="img/default-avatar.png" alt="User Avatar">
           <span id="userName">User</span>
@@ -70,6 +71,7 @@
       <li><a href="upi.html">UPI</a></li>
       <li><a href="recharge.html">Recharge</a></li>
       <li><a href="profile.html">Profile</a></li>
+      <li><a href="family-dashboard.html" style="color: var(--primary-dark); font-weight: 700;">👪 Lite Accounts</a></li>
       <li><a href="#" id="mobileLogout">Logout</a></li>
     </ul>
   </div>
@@ -93,6 +95,12 @@
       </div>
       
       <div class="action-buttons">
+        <button type="button" id="scanQrBtn" class="btn scan-qr-btn" aria-label="Scan a QR code to pay">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm9-2h3v3h-3zm4 0h3v3h-3zm-4 4h3v3h-3zm4 0h3v3h-3z"/>
+          </svg>
+          <span>Scan &amp; Pay</span>
+        </button>
         <button id="sendMoneyBtn" class="btn btn-primary">Send Money</button>
       </div>
     </section>

@@ -222,17 +222,12 @@ function triggerBotResponse(userText) {
     2. Under linked accounts, select "Reset UPI PIN".<br>
     3. Input your debit card details (last 6 digits and expiry).<br>
     4. Set your new 4-digit UPI PIN and verify.`;
-  } else if (text.includes('cooldown') || text.includes('add money') || text.includes('limit')) {
-    botReply = `For security reasons, PayMoney has limits on Add Money transactions:<br>
-    1. You can only Add Money once per hour (cooldown limit).<br>
-    2. The maximum single transactional Add Money limit is ₹50,000.<br>
-    Please wait 1 hour or select another payment option.`;
   } else if (text.includes('kyc') || text.includes('profile') || text.includes('setting')) {
     botReply = `To complete your KYC or update settings, head to the Profile section from the top navigation. There, you can update your avatar, name, and check your security status.`;
   } else if (text.includes('hi') || text.includes('hello') || text.includes('hey') || text.includes('help')) {
-    botReply = `Hello! How can I help you? You can choose a quick reply above or ask about transaction status, wallet balance additions, UPI, or KYC.`;
+    botReply = `Hello! How can I help you? You can choose a quick reply above or ask about transaction status, wallet balances, UPI, or KYC.`;
   } else {
-    botReply = `I didn't quite capture that. You can raise a support ticket using the "Raise a Ticket" form on the left, or ask another query about UPI, recharges, or wallet cooldowns.`;
+    botReply = `I didn't quite capture that. You can raise a support ticket using the "Raise a Ticket" form on the left, or ask another query about UPI, recharges, or transaction status.`;
   }
   
   // Simulate natural delay (900ms)

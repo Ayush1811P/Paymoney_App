@@ -23,7 +23,7 @@
 }
 
 .logo-icon-svg .cuff {
-  fill: #00BDF5; /* Light cyan cuff */
+  fill: #d4a24c; /* Gold cuff */
 }
 
 .logo-icon-svg .cuff-button {
@@ -32,21 +32,21 @@
 
 .logo-icon-svg .card-body {
   fill: url(#cardGradient);
-  stroke: #0A2540; /* Dark blue outline */
+  stroke: #0a0a0a; /* Dark outline */
   stroke-width: 2.5px;
 }
 
 .logo-icon-svg .card-stripe {
-  fill: #0A2540;
+  fill: #0a0a0a;
 }
 
 .logo-icon-svg .card-chip {
-  fill: #E6F0FA;
+  fill: #f6e6c6;
 }
 
 .logo-icon-svg .hand {
   fill: #FFFFFF;
-  stroke: #0A2540; /* Dark blue outline */
+  stroke: #0a0a0a; /* Dark outline */
   stroke-width: 2.5px;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -64,11 +64,23 @@
 }
 
 .logo-text-css .pay-part {
-  color: #0A2540; /* Dark blue */
+  color: #0a0a0a;
 }
 
 .logo-text-css .money-part {
-  color: #00BDF5; /* Cyan */
+  color: #d4a24c;
+}
+
+.logo-icon-svg stop:first-child {
+  stop-color: #f3d9a0;
+}
+
+.logo-icon-svg stop:last-child {
+  stop-color: #d4a24c;
+}
+
+.logo-icon-svg circle:not(.cuff-button) {
+  fill: #d4a24c;
 }
 
 /* Responsive adjustments */
